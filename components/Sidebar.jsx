@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { FaHouse } from "react-icons/fa6";
 import InstagramLogo from "./InstagramLogo.jsx";
+import NavLink from "./NavLink.jsx";
 import styles from "./Sidebar.module.scss";
 
 function Sidebar() {
@@ -14,17 +15,17 @@ function Sidebar() {
       </div>
 
       <div className={styles.menuContainer}>
-        <Link href="/" className={styles.menuItem}>
+        <NavLink href="/" className={styles.menuItem}>
           <FaHouse size={24} />
           <span className={styles.menuText}>홈</span>
-        </Link>
+        </NavLink>
 
-        <Link href="/jaehoon" className={styles.menuItem}>
+        <NavLink href="/jaehoon" className={styles.menuItem}>
           <div className={styles.profileImage}>
             <img src="https://picsum.photos/seed/jaehoon/40/40" alt="프로필" />
           </div>
           <span className={styles.menuText}>프로필</span>
-        </Link>
+        </NavLink>
       </div>
     </nav>
   );
