@@ -1,4 +1,4 @@
-// ~/instagram-next/app/page.js
+// ~/instagram-next/app/(main)/page.js
 import page from "@/components/FeedPage.module.scss";
 import styles from "@/components/FeedList.module.scss";
 import FeedItem from "@/components/FeedItem.jsx";

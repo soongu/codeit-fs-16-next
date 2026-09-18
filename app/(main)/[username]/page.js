@@ -1,4 +1,4 @@
-// ~/instagram-next/app/[username]/page.js
+// ~/instagram-next/app/(main)/[username]/page.js
 import styles from "@/components/ProfilePage.module.scss";
 import stateStyles from "@/components/StatusMessage.module.scss";
 import ProfileImage from "@/components/ProfileImage.jsx";

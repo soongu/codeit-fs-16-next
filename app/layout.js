@@ -1,6 +1,5 @@
 // ~/instagram-next/app/layout.js
 import "@/styles/global.scss";
-import Sidebar from "@/components/Sidebar.jsx";
 
 export const metadata = {
   title: "Create Next App",
@@ -11,7 +10,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body>
-        <Sidebar />
         {children}
       </body>
     </html>
