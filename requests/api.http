@@ -30,3 +30,12 @@ GET http://localhost:3000/api/members/search?keyword=mi
 
 ### 검색어 없이
 GET http://localhost:3000/api/members/search
+
+### 사진 없이 올리기
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+  "username": "yuna",
+  "content": "사진은 깜빡했어요"
+}
