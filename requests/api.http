@@ -1,0 +1,5 @@
+### 민지의 프로필 화면
+GET http://localhost:3000/minji
+
+### 게시물 목록
+GET http://localhost:3000/api/posts
