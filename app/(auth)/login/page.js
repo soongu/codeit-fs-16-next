@@ -1,4 +1,4 @@
-// ~/instagram-next/app/login/page.js
+// ~/instagram-next/app/(auth)/login/page.js
 import styles from "@/components/StatusMessage.module.scss";
 
 export default function LoginPage() {

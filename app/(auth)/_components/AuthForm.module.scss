@@ -1,0 +1,115 @@
+// src/pages/auth/AuthForm.module.scss
+
+.authForm {
+  margin: 24px 0;
+}
+
+.formField {
+  margin-bottom: 6px;
+  position: relative;
+
+  .inputContainer {
+    position: relative;
+    width: 100%;
+  }
+
+  input {
+    width: 100%;
+    padding: 9px 8px;
+    border: 1px solid #dbdbdb;
+    border-radius: 3px;
+    background-color: #fafafa;
+    font-size: 12px;
+
+    &:focus {
+      border-color: #a8a8a8;
+      outline: none;
+    }
+  }
+
+  &.error input {
+    border-color: #ed4956;
+  }
+
+  &.success input {
+    border-color: #dbdbdb; // 성공 시 기본 테두리 유지 또는 변경 가능
+  }
+
+  .successIcon, .errorIcon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+  }
+
+  .successIcon {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2328a745"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>') no-repeat center;
+  }
+
+  .errorIcon {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ed4956"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>') no-repeat center;
+  }
+}
+
+.errorMessage {
+  color: #ed4956;
+  font-size: 13px;
+  line-height: 18px;
+  margin: 14px 0;
+  text-align: center;
+  display: block;
+  word-break: keep-all; /* 단어 단위로 줄바꿈 방지 */
+}
+
+.authButton {
+  width: 100%;
+  padding: 7px 16px;
+  background-color: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 8px 0;
+
+  &:disabled {
+    background-color: #b2dffc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 32px; // 아이콘(20px + 오른여백 8px 등)을 고려해 좌측으로 밀어둠
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: #262626;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px;
+}
+
+.passwordFeedback {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+
+  &.weak {
+    color: #f7a700;  // 주황색 (약한 비밀번호)
+  }
+
+  &.medium {
+    color: #00a400;  // 초록색 (중간 강도)
+  }
+
+  &.strong {
+    color: #4caf50;  // 진한 초록색 (강한 비밀번호)
+  }
+}
