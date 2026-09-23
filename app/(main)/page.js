@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <main className={page.mainContent}>
       <div className={styles.feedList}>
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <FeedItem
             key={post.id}
             postId={post.id}
@@ -20,6 +20,7 @@ export default function Home() {
             createdAt={post.createdAt}
             likeCount={post.likeCount}
             commentCount={post.commentCount}
+            isFirst={index === 0}
           />
         ))}
       </div>
