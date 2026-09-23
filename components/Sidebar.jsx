@@ -1,5 +1,6 @@
 // ~/instagram-next/components/Sidebar.jsx
 import Link from "next/link";
+import Image from "next/image";
 import { FaHouse } from "react-icons/fa6";
 import InstagramLogo from "./InstagramLogo.jsx";
 import NavLink from "./NavLink.jsx";
@@ -22,7 +23,12 @@ function Sidebar() {
 
         <NavLink href="/jaehoon" className={styles.menuItem}>
           <div className={styles.profileImage}>
-            <img src="https://picsum.photos/seed/jaehoon/40/40" alt="프로필" />
+            <Image
+              src="https://picsum.photos/seed/jaehoon/40/40"
+              alt="프로필"
+              width={40}
+              height={40}
+            />
           </div>
           <span className={styles.menuText}>프로필</span>
         </NavLink>

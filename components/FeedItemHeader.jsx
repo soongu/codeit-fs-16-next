@@ -1,5 +1,6 @@
 // ~/instagram-next/components/FeedItemHeader.jsx
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./FeedItem.module.scss";
 import { FaEllipsis } from "react-icons/fa6";
 const FeedItemHeader = ({
@@ -11,7 +12,12 @@ const FeedItemHeader = ({
       <div className={styles.userInfo}>
         <Link href={`/${username}`} className={styles.profileLink}>
           <div className={styles.profileImage}>
-            <img src={profileImage} alt={`${username}의 프로필`} />
+            <Image
+              src={profileImage}
+              alt={`${username}의 프로필`}
+              width={40}
+              height={40}
+            />
           </div>
         </Link>
         <div className={styles.userDetails}>
