@@ -13,6 +13,7 @@ export default function LoginPage() {
           alt="Instagram 앱 스크린샷"
           width={842}
           height={1234}
+          sizes="24vw"
           style={{ height: "auto" }}
         />
       </div>
