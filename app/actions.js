@@ -1,6 +1,7 @@
 // ~/instagram-next/app/actions.js
 "use server";
 
+import { refresh } from "next/cache";
 import { posts } from "@/data/posts.js";
 
 export async function likePost(postId) {
@@ -10,4 +11,6 @@ export async function likePost(postId) {
     post.liked = true;
     post.likeCount += 1;
   }
+
+  refresh();
 }
