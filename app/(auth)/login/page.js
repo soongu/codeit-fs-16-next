@@ -4,6 +4,10 @@ import layoutStyles from "../_components/AuthLayout.module.scss";
 import styles from "../_components/LoginPage.module.scss";
 import AuthCard from "../_components/AuthCard.jsx";
 
+export const metadata = {
+  title: "로그인",
+};
+
 export default function LoginPage() {
   return (
     <>
