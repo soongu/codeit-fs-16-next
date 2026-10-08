@@ -18,6 +18,7 @@ const FeedItem = ({
   content,
   createdAt,
   likeCount,
+  liked,
   commentCount,
   isFirst,
 }) => {
@@ -41,7 +42,7 @@ const FeedItem = ({
         </div>
       </div>
 
-      <FeedItemActions postId={postId} likeCount={likeCount} />
+      <FeedItemActions postId={postId} likeCount={likeCount} liked={liked} />
 
       <div className={styles.content}>
         <FeedItemContent
