@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FaHouse } from "react-icons/fa6";
 import InstagramLogo from "./InstagramLogo.jsx";
 import NavLink from "./NavLink.jsx";
+import CreateButton from "./CreateButton.jsx";
 import styles from "./Sidebar.module.scss";
 
 function Sidebar() {
@@ -20,6 +21,8 @@ function Sidebar() {
           <FaHouse size={24} />
           <span className={styles.menuText}>홈</span>
         </NavLink>
+
+        <CreateButton />
 
         <NavLink href="/jaehoon" className={styles.menuItem}>
           <div className={styles.profileImage}>
