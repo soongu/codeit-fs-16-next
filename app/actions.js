@@ -14,3 +14,14 @@ export async function likePost(postId) {
 
   refresh();
 }
+
+export async function unlikePost(postId) {
+  const post = posts.find((item) => item.id === postId);
+
+  if (post.liked) {
+    post.liked = false;
+    post.likeCount -= 1;
+  }
+
+  refresh();
+}
