@@ -1,4 +1,6 @@
 // ~/instagram-next/data/posts.js
+import { cacheLife } from "next/cache";
+
 // 지금으로부터 몇 분 전인 시각을 만들어요 — 파트2 서버가 보내던 모양의 글자로.
 const minutesBefore = (minutes) => new Date(Date.now() - minutes * 60 * 1000).toISOString();
 
@@ -44,6 +46,7 @@ export const posts = [
 // 게시물 목록을 돌려줘요. 데이터베이스에서 읽는 것처럼 2초 기다려요.
 export async function getPosts() {
   "use cache";
+  cacheLife("hours");
 
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
