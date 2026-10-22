@@ -6,7 +6,6 @@ import { posts } from "@/data/posts.js";
 
 const FeedList = async () => {
   await connection();
-  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   return (
     <div className={styles.feedList}>
