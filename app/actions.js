@@ -1,7 +1,7 @@
 // ~/instagram-next/app/actions.js
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { posts } from "@/data/posts.js";
 
 function findPost(postId) {
@@ -22,7 +22,7 @@ export async function likePost(postId) {
     post.likeCount += 1;
   }
 
-  updateTag("posts");
+  revalidateTag("posts", "max");
 }
 
 export async function unlikePost(postId) {
@@ -33,5 +33,5 @@ export async function unlikePost(postId) {
     post.likeCount -= 1;
   }
 
-  updateTag("posts");
+  revalidateTag("posts", "max");
 }
