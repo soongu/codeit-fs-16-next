@@ -5,6 +5,8 @@ import FeedItem from "./FeedItem.jsx";
 import { getPosts } from "@/data/posts.js";
 
 const FeedList = async () => {
+  "use cache";
+
   await connection();
   const posts = await getPosts();
 
