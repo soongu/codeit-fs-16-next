@@ -9,6 +9,10 @@ export function proxy(request) {
     return NextResponse.redirect(new URL(pathname.toLowerCase(), request.url));
   }
 
+  if (pathname === "/login" || pathname.includes(".")) {
+    return;
+  }
+
   const username = pathname.split("/")[1];
   const profile = profiles.find((item) => item.username === username);
 
