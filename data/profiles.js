@@ -1,4 +1,6 @@
 // ~/instagram-next/data/profiles.js
+import { cacheLife } from "next/cache";
+
 export const profiles = [
   {
     username: "jaehoon",
@@ -28,6 +30,9 @@ export const profiles = [
 
 // 한 사람의 프로필을 돌려줘요. 데이터베이스에서 읽는 것처럼 2초 기다려요.
 export async function getProfile(username) {
+  "use cache";
+  cacheLife("hours");
+
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   return profiles.find((item) => item.username === username);
