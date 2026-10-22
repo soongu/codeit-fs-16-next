@@ -2,10 +2,11 @@
 import { connection } from "next/server";
 import styles from "./FeedList.module.scss";
 import FeedItem from "./FeedItem.jsx";
-import { posts } from "@/data/posts.js";
+import { getPosts } from "@/data/posts.js";
 
 const FeedList = async () => {
   await connection();
+  const posts = await getPosts();
 
   return (
     <div className={styles.feedList}>
