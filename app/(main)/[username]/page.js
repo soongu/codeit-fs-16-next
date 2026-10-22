@@ -12,6 +12,7 @@ export function generateStaticParams() {
 
 export default async function ProfilePage({ params }) {
   const { username } = await params;
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   const profile = profiles.find((item) => item.username === username);
 
   if (profile === undefined) {
