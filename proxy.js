@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 export function proxy(request) {
   const { pathname } = request.nextUrl;
-  console.log("proxy:", request.method, pathname);
 
   if (pathname !== pathname.toLowerCase()) {
     return NextResponse.redirect(new URL(pathname.toLowerCase(), request.url));
