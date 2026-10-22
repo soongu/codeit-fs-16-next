@@ -9,3 +9,7 @@ export function proxy(request) {
     return NextResponse.redirect(new URL(pathname.toLowerCase(), request.url));
   }
 }
+
+export const config = {
+  matcher: ["/:username", "/:username/saved"],
+};
