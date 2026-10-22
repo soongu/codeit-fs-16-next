@@ -43,13 +43,11 @@ export const posts = [
   },
 ];
 
-// 게시물 목록을 돌려줘요. 데이터베이스에서 읽는 것처럼 2초 기다려요.
+// 게시물 목록을 돌려줘요.
 export async function getPosts() {
   "use cache";
   cacheLife("hours");
   cacheTag("posts");
-
-  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   return posts;
 }
