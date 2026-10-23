@@ -39,7 +39,7 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
       queryClient.setQueryData(["posts"], onMutateResult.previousPosts);
       console.error(error);
     },
-    onSuccess: async () => {
+    onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
