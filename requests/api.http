@@ -1,47 +1,17 @@
 ### 민지의 프로필 화면
-GET http://localhost:3000/minji
-
-### 게시물 목록
-GET http://localhost:3000/api/posts
-
-### 게시물 올리기
-POST http://localhost:3000/api/posts
-Content-Type: application/json
-
-{
-  "username": "yuna",
-  "profileImage": "https://picsum.photos/seed/yuna/40/40",
-  "postImage": "https://picsum.photos/seed/post4/600/600",
-  "postAlt": "창밖으로 본 저녁 하늘 사진",
-  "content": "오늘의 한 장 📷"
-}
+GET http://localhost:3001/minji
 
 ### 민지의 프로필
-GET http://localhost:3000/api/profiles/minji
+GET http://localhost:3001/api/profiles/minji
 
 ### 없는 사람의 프로필
-GET http://localhost:3000/api/profiles/kimchi
+GET http://localhost:3001/api/profiles/kimchi
 
 ### 없는 주소
-GET http://localhost:3000/api/comments
+GET http://localhost:3001/api/comments
 
 ### 이름에 mi가 든 사람
-GET http://localhost:3000/api/members/search?keyword=mi
+GET http://localhost:3001/api/members/search?keyword=mi
 
 ### 검색어 없이
-GET http://localhost:3000/api/members/search
-
-### 사진 없이 올리기
-POST http://localhost:3000/api/posts
-Content-Type: application/json
-
-{
-  "username": "yuna",
-  "content": "사진은 깜빡했어요"
-}
-
-### 1번 게시물에 좋아요
-PUT http://localhost:3000/api/posts/1/likes
-
-### 1번 게시물 좋아요 취소
-DELETE http://localhost:3000/api/posts/1/likes
+GET http://localhost:3001/api/members/search
