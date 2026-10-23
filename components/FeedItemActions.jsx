@@ -22,6 +22,8 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: changeLike,
     onMutate: (variables) => {
+      const previousPosts = queryClient.getQueryData(["posts"]);
+
       queryClient.setQueryData(["posts"], (posts) =>
         posts.map((post) =>
           post.id === variables.postId
@@ -29,6 +31,12 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
             : post,
         ),
       );
+
+      return { previousPosts };
+    },
+    onError: (error, variables, onMutateResult) => {
+      queryClient.setQueryData(["posts"], onMutateResult.previousPosts);
+      console.error(error);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
