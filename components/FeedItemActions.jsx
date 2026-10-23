@@ -21,6 +21,15 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
     mutationFn: changeLike,
+    onMutate: (variables) => {
+      queryClient.setQueryData(["posts"], (posts) =>
+        posts.map((post) =>
+          post.id === variables.postId
+            ? { ...post, liked: variables.liked, likeCount: post.likeCount + (variables.liked ? 1 : -1) }
+            : post,
+        ),
+      );
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
