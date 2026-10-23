@@ -1,23 +1,30 @@
 // ~/instagram-next/components/FeedItemActions.jsx
 "use client";
 
-import { useTransition } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaHeart, FaRegBookmark, FaRegComment, FaRegHeart, FaRegPaperPlane } from "react-icons/fa6";
 import styles from "./FeedItem.module.scss";
-import { likePost, unlikePost } from "@/app/actions.js";
+
+async function changeLike({ postId, liked }) {
+  const response = await fetch(`/api/posts/${postId}/likes`, {
+    method: liked ? "PUT" : "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`좋아요를 바꾸지 못했어요 (${response.status})`);
+  }
+
+  return response.json();
+}
 
 const FeedItemActions = ({ postId, likeCount, liked }) => {
-  const [isPending, startTransition] = useTransition();
-
-  const handleLike = () => {
-    startTransition(async () => {
-      if (liked) {
-        await unlikePost(postId);
-      } else {
-        await likePost(postId);
-      }
-    });
-  };
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation({
+    mutationFn: changeLike,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
 
   return (
     <div className={styles.actions}>
@@ -26,7 +33,7 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
           <button
             type="button"
             className={styles.actionButton}
-            onClick={handleLike}
+            onClick={() => mutate({ postId, liked: !liked })}
             disabled={isPending}
             aria-busy={isPending}
           >

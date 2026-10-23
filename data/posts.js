@@ -1,6 +1,4 @@
 // ~/instagram-next/data/posts.js
-import { cacheLife, cacheTag } from "next/cache";
-
 // 지금으로부터 몇 분 전인 시각을 만들어요 — 파트2 서버가 보내던 모양의 글자로.
 const minutesBefore = (minutes) => new Date(Date.now() - minutes * 60 * 1000).toISOString();
 
@@ -42,12 +40,3 @@ export const posts = [
     commentCount: 2,
   },
 ];
-
-// 게시물 목록을 돌려줘요.
-export async function getPosts() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("posts");
-
-  return posts;
-}
