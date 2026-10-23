@@ -8,7 +8,7 @@ import FeedItem from "./FeedItem.jsx";
 import FeedSkeleton from "./FeedSkeleton.jsx";
 
 async function getPosts() {
-  const response = await fetch("http://localhost:3000/api/posts");
+  const response = await fetch("/api/posts");
 
   if (!response.ok) {
     throw new Error(`게시물을 불러오지 못했어요 (${response.status})`);
