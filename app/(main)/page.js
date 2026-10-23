@@ -1,23 +1,11 @@
 // ~/instagram-next/app/(main)/page.js
-import { Suspense } from "react";
 import page from "@/components/FeedPage.module.scss";
-import styles from "@/components/FeedList.module.scss";
 import FeedList from "@/components/FeedList.jsx";
-import FeedSkeleton from "@/components/FeedSkeleton.jsx";
 
 export default function Home() {
   return (
     <main className={page.mainContent}>
-      <Suspense
-        fallback={
-          <div className={styles.loader}>
-            <FeedSkeleton />
-            <FeedSkeleton />
-          </div>
-        }
-      >
-        <FeedList />
-      </Suspense>
+      <FeedList />
     </main>
   );
 }

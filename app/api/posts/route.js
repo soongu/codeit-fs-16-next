@@ -1,7 +1,9 @@
 // ~/instagram-next/app/api/posts/route.js
 import { posts } from "@/data/posts.js";
 
-export function GET() {
+export async function GET() {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   return Response.json(posts);
 }
 
