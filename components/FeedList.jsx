@@ -1,6 +1,7 @@
 // ~/instagram-next/components/FeedList.jsx
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import styles from "./FeedList.module.scss";
 import stateStyles from "./StatusMessage.module.scss";
@@ -23,13 +24,36 @@ async function getPostPage({ pageParam }) {
 }
 
 const FeedList = () => {
-  const { data, isPending, error } = useInfiniteQuery({
-    queryKey: ["posts"],
-    queryFn: getPostPage,
-    initialPageParam: null,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.items[lastPage.items.length - 1].id : null,
-  });
+  const { data, isPending, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["posts"],
+      queryFn: getPostPage,
+      initialPageParam: null,
+      getNextPageParam: (lastPage) =>
+        lastPage.hasNext ? lastPage.items[lastPage.items.length - 1].id : null,
+    });
+  const loaderRef = useRef(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) {
+      return;
+    }
+
+    const target = loaderRef.current;
+    if (target === null) {
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchNextPage();
+      }
+    });
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isPending) {
     return (
@@ -66,6 +90,14 @@ const FeedList = () => {
             isFirst={index === 0}
           />
         ))}
+      </div>
+      <div ref={loaderRef} className={styles.loader}>
+        {isFetchingNextPage && (
+          <>
+            <FeedSkeleton />
+            <FeedSkeleton />
+          </>
+        )}
       </div>
     </>
   );
