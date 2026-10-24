@@ -3,16 +3,24 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
 import styles from "./Carousel.module.scss";
 
-const Carousel = ({ imageUrls, alt, isFirst }) => {
+const Carousel = ({ imageUrls, alt, isFirst, onImageDoubleClick }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showHeart, setShowHeart] = useState(false);
 
   // 첫 장보다 앞이나 마지막 장보다 뒤로는 가지 않는다.
   const goToSlide = (index) => {
     if (index < 0 || index >= imageUrls.length) return;
     setCurrentIndex(index);
+  };
+
+  // 사진을 두 번 누르면 하트가 0.8초 동안 커졌다 사라진다.
+  const handleDoubleClick = () => {
+    onImageDoubleClick();
+    setShowHeart(true);
+    setTimeout(() => setShowHeart(false), 800);
   };
 
   return (
@@ -22,7 +30,11 @@ const Carousel = ({ imageUrls, alt, isFirst }) => {
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {imageUrls.map((imageUrl, index) => (
-          <div key={index} className={styles.carouselSlide}>
+          <div
+            key={index}
+            className={styles.carouselSlide}
+            onDoubleClick={handleDoubleClick}
+          >
             <Image
               src={imageUrl}
               alt={alt}
@@ -33,6 +45,9 @@ const Carousel = ({ imageUrls, alt, isFirst }) => {
           </div>
         ))}
       </div>
+
+      {/* 큰 하트는 움직이는 트랙이 아니라 컨테이너 안에 하나만 둔다 — 그래야 몇 번째 사진이든 가운데에 뜬다. */}
+      {showHeart && <FaHeart className={styles.doubleClickHeart} />}
 
       {imageUrls.length > 1 && (
         <>

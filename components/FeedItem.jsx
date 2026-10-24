@@ -25,6 +25,12 @@ const FeedItem = ({
   const { mutate, isPending } = useLikePost();
   const toggleLike = () => mutate({ postId, liked: !liked });
 
+  // 사진을 두 번 누르는 것은 «누르기» 만 한다 — 이미 눌렀거나 보내는 중이면 보내지 않는다.
+  const likeByDoubleClick = () => {
+    if (liked || isPending) return;
+    mutate({ postId, liked: true });
+  };
+
   return (
     <article className={styles.post}>
       <FeedItemHeader
@@ -34,7 +40,12 @@ const FeedItem = ({
       />
 
       <div className={styles.imageContainer}>
-        <Carousel imageUrls={imageUrls} alt={postAlt} isFirst={isFirst} />
+        <Carousel
+          imageUrls={imageUrls}
+          alt={postAlt}
+          isFirst={isFirst}
+          onImageDoubleClick={likeByDoubleClick}
+        />
       </div>
 
       <FeedItemActions
