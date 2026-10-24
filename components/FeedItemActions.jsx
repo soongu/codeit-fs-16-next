@@ -18,6 +18,18 @@ async function changeLike({ postId, liked }) {
   return response.json();
 }
 
+// 받아 둔 페이지들을 돌며 게시물 하나만 바꾼 새 데이터를 만든다.
+// change 는 그 게시물을 받아 바꿀 필드만 돌려주는 함수다.
+function changePost(data, postId, change) {
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      items: page.items.map((post) => (post.id === postId ? { ...post, ...change(post) } : post)),
+    })),
+  };
+}
+
 const FeedItemActions = ({ postId, likeCount, liked }) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
@@ -26,25 +38,23 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
       await queryClient.cancelQueries({ queryKey: ["posts"] });
       const previousPosts = queryClient.getQueryData(["posts"]);
 
-      queryClient.setQueryData(["posts"], (data) => ({
-        ...data,
-        pages: data.pages.map((page) => ({
-          ...page,
-          items: page.items.map((post) =>
-            post.id === variables.postId
-              ? { ...post, liked: variables.liked, likeCount: post.likeCount + (variables.liked ? 1 : -1) }
-              : post,
-          ),
+      queryClient.setQueryData(["posts"], (data) =>
+        changePost(data, variables.postId, (post) => ({
+          liked: variables.liked,
+          likeCount: post.likeCount + (variables.liked ? 1 : -1),
         })),
-      }));
+      );
 
       return { previousPosts };
     },
-    onError: (error, variables, onMutateResult) => {
+    onSuccess: (result, variables) => {
+      // 서버가 돌려준 { liked, likeCount } 로 그 게시물만 맞춘다.
+      queryClient.setQueryData(["posts"], (data) => changePost(data, variables.postId, () => result));
+    },
+    onError: async (error, variables, onMutateResult) => {
       queryClient.setQueryData(["posts"], onMutateResult.previousPosts);
       console.error(error);
-    },
-    onSettled: async () => {
+      // 실패했을 때만 서버의 지금 모습을 다시 받는다.
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
