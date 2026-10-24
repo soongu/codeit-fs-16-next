@@ -7,6 +7,7 @@ import FeedItemContent from "./FeedItemContent.jsx";
 import FeedItemComments from "./FeedItemComments.jsx";
 import CommentForm from "./CommentForm.jsx";
 import CommentArea from "./CommentArea.jsx";
+import { useLikePost } from "@/hooks/useLikePost.js";
 
 const FeedItem = ({
   postId,
@@ -21,6 +22,9 @@ const FeedItem = ({
   commentCount,
   isFirst,
 }) => {
+  const { mutate, isPending } = useLikePost();
+  const toggleLike = () => mutate({ postId, liked: !liked });
+
   return (
     <article className={styles.post}>
       <FeedItemHeader
@@ -33,7 +37,12 @@ const FeedItem = ({
         <Carousel imageUrls={imageUrls} alt={postAlt} isFirst={isFirst} />
       </div>
 
-      <FeedItemActions postId={postId} likeCount={likeCount} liked={liked} />
+      <FeedItemActions
+        likeCount={likeCount}
+        liked={liked}
+        isPending={isPending}
+        onToggleLike={toggleLike}
+      />
 
       <div className={styles.content}>
         <FeedItemContent
