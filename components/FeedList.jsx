@@ -81,7 +81,7 @@ const FeedList = () => {
             postId={post.id}
             username={post.username}
             profileImage={post.profileImage}
-            postImage={post.imageUrls[0]}
+            imageUrls={post.imageUrls}
             postAlt={post.postAlt}
             content={post.content}
             createdAt={post.createdAt}

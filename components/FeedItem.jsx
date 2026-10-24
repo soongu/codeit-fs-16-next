@@ -1,7 +1,6 @@
 // ~/instagram-next/components/FeedItem.jsx
-import Image from "next/image";
 import styles from "./FeedItem.module.scss";
-import carousel from "./Carousel.module.scss";
+import Carousel from "./Carousel.jsx";
 import FeedItemHeader from "./FeedItemHeader.jsx";
 import FeedItemActions from "./FeedItemActions.jsx";
 import FeedItemContent from "./FeedItemContent.jsx";
@@ -13,7 +12,7 @@ const FeedItem = ({
   postId,
   username,
   profileImage,
-  postImage,
+  imageUrls,
   postAlt,
   content,
   createdAt,
@@ -31,15 +30,7 @@ const FeedItem = ({
       />
 
       <div className={styles.imageContainer}>
-        <div className={carousel.carouselSlide}>
-          <Image
-            src={postImage}
-            alt={postAlt}
-            width={600}
-            height={600}
-            loading={isFirst ? "eager" : "lazy"}
-          />
-        </div>
+        <Carousel imageUrls={imageUrls} alt={postAlt} isFirst={isFirst} />
       </div>
 
       <FeedItemActions postId={postId} likeCount={likeCount} liked={liked} />
