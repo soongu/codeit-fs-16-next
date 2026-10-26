@@ -6,4 +6,8 @@ export const useUiStore = create((set) => ({
   isCreateFeedOpen: false,
   openCreateFeed: () => set({ isCreateFeedOpen: true }),
   closeCreateFeed: () => set({ isCreateFeedOpen: false }),
+
+  isSearchOpen: false,
+  toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
+  closeSearch: () => set({ isSearchOpen: false }),
 }));
