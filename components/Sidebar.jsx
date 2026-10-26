@@ -7,12 +7,13 @@ import NavLink from "./NavLink.jsx";
 import CreateButton from "./CreateButton.jsx";
 import SearchButton from "./SearchButton.jsx";
 import SearchPanel from "./SearchPanel.jsx";
+import SidebarNav from "./SidebarNav.jsx";
 import styles from "./Sidebar.module.scss";
 
 function Sidebar() {
   return (
     <>
-      <nav className={styles.sidebar}>
+      <SidebarNav>
         <div className={styles.logoContainer}>
           <Link href="/" className={styles.logo}>
             <InstagramLogo />
@@ -41,7 +42,7 @@ function Sidebar() {
             <span className={styles.menuText}>프로필</span>
           </NavLink>
         </div>
-      </nav>
+      </SidebarNav>
 
       <SearchPanel />
     </>
