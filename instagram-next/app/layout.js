@@ -1,5 +1,4 @@
 // ~/instagram-next/app/layout.js
-import Sidebar from '@/components/Sidebar.jsx';
 import '@/styles/global.scss';
 
 export const metadata = {
@@ -11,7 +10,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang='ko'>
       <body>
-        <Sidebar />
         {children}
       </body>
     </html>
