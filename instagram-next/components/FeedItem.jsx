@@ -1,0 +1,60 @@
+// ~/instagram-react/src/components/FeedItem.jsx
+import styles from './FeedItem.module.scss';
+import carousel from './Carousel.module.scss';
+import FeedItemHeader from './FeedItemHeader.jsx';
+import FeedItemActions from './FeedItemActions.jsx';
+import FeedItemContent from './FeedItemContent.jsx';
+import FeedItemComments from './FeedItemComments.jsx';
+import CommentForm from './CommentForm.jsx';
+import CommentArea from './CommentArea.jsx';
+
+const FeedItem = ({
+  postId,
+  username,
+  profileImage,
+  postImage,
+  postAlt,
+  content,
+  createdAt,
+  likeCount,
+  commentCount,
+}) => {
+  return (
+    <article className={styles.post}>
+      <FeedItemHeader
+        postId={postId}
+        username={username}
+        profileImage={profileImage}
+      />
+
+      <div className={styles.imageContainer}>
+        <div className={carousel.carouselSlide}>
+          <img
+            src={postImage}
+            alt={postAlt}
+          />
+        </div>
+      </div>
+
+      <FeedItemActions
+        postId={postId}
+        likeCount={likeCount}
+      />
+
+      <div className={styles.content}>
+        <FeedItemContent
+          username={username}
+          content={content}
+          createdAt={createdAt}
+        />
+      </div>
+
+      <CommentArea>
+        <FeedItemComments commentCount={commentCount} />
+        <CommentForm postId={postId} />
+      </CommentArea>
+    </article>
+  );
+};
+
+export default FeedItem;
