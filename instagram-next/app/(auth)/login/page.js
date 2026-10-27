@@ -1,10 +1,48 @@
-// ~/instagram-next/app/login/page.js
-import styles from '@/components/StatusMessage.module.scss';
+// ~/instagram-next/app/(auth)/login/page.js
+import layoutStyles from '../_components/AuthLayout.module.scss';
+import styles from '../_components/LoginPage.module.scss';
+import AuthCard from '../_components/AuthCard.jsx';
 
 export default function LoginPage() {
   return (
-    <main className={styles.hashtagMain}>
-      <p className={styles.emptyHint}>여기에 로그인 화면이 들어와요.</p>
-    </main>
+    <>
+      <div className={layoutStyles.authImage}>
+        <img
+          src='/phones.png'
+          alt='Instagram 앱 스크린샷'
+        />
+      </div>
+
+      <div className={layoutStyles.authFormContainer}>
+        <AuthCard showLogo={true}>
+          <form
+            className={styles.authForm}
+            noValidate>
+            <div className={styles.formField}>
+              <input
+                type='text'
+                name='username'
+                placeholder='전화번호, 사용자 이름 또는 이메일'
+                required
+              />
+            </div>
+            <div className={styles.formField}>
+              <input
+                type='password'
+                name='password'
+                placeholder='비밀번호'
+                required
+              />
+            </div>
+            <button
+              type='submit'
+              className={styles.authButton}
+              disabled>
+              로그인
+            </button>
+          </form>
+        </AuthCard>
+      </div>
+    </>
   );
 }
