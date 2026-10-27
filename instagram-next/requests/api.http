@@ -21,3 +21,30 @@ GET http://localhost:3000/api/profiles/minji
 
 ### 없는 사람의 프로필
 GET http://localhost:3000/api/profiles/kimchi
+
+### 없는 주소
+GET http://localhost:3000/api/comments
+
+### 이름에 mi가 든 사람
+GET http://localhost:3000/api/members/search?keyword=mi
+
+### 검색어 없이
+GET http://localhost:3000/api/members/search
+
+### 사진 없이 올리기
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+  "username": "yuna",
+  "content": "사진은 깜빡했어요"
+}
+
+### 사진 올리기
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+
+{
+  "username": "yuna",
+  "postImage": "/post/image/123"
+}
