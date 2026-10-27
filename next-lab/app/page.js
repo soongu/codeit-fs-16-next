@@ -1,16 +1,14 @@
 // ~/next-lab/app/page.js
-import TimeAgo from '@/components/TimeAgo.jsx';
-
-const minutesList = [12, 45, 150];
+import ProfileRow from '@/components/ProfileRow.jsx';
 
 export default function Home() {
   return (
     <main>
-      {minutesList.map((minutes) => (
-        <p key={minutes}>
-          <TimeAgo minutes={minutes} />
-        </p>
-      ))}
+      <ProfileRow
+        username='seungwoo'
+        profileImage='https://picsum.photos/seed/seungwoo/40/40'
+        minutes={180}
+      />
     </main>
   );
 }
