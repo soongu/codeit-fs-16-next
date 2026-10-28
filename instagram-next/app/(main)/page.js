@@ -1,29 +1,22 @@
-// ~/instagram-next/app/page.js
+// ~/instagram-next/app/(main)/page.js
+import { Suspense } from 'react';
 import page from '@/components/FeedPage.module.scss';
 import styles from '@/components/FeedList.module.scss';
-import FeedItem from '@/components/FeedItem.jsx';
-import { posts } from '@/data/posts.js';
+import FeedList from '@/components/FeedList.jsx';
+import FeedSkeleton from '@/components/FeedSkeleton.jsx';
 
 export default function Home() {
   return (
     <main className={page.mainContent}>
-      <div className={styles.feedList}>
-        {posts.map((post, index) => (
-          <FeedItem
-            key={post.id}
-            postId={post.id}
-            username={post.username}
-            profileImage={post.profileImage}
-            postImage={post.postImage}
-            postAlt={post.postAlt}
-            content={post.content}
-            createdAt={post.createdAt}
-            likeCount={post.likeCount}
-            commentCount={post.commentCount}
-            isFirst={index === 0}
-          />
-        ))}
-      </div>
+      <Suspense
+        fallback={
+          <div className={styles.loader}>
+            <FeedSkeleton />
+            <FeedSkeleton />
+          </div>
+        }>
+        <FeedList />
+      </Suspense>
     </main>
   );
 }
