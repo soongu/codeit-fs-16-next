@@ -1,22 +1,36 @@
-// ~/instagram-next/app/[username]/page.js
+// ~/instagram-next/app/(main)/[username]/page.js
+import { notFound } from 'next/navigation';
 import styles from '@/components/ProfilePage.module.scss';
 import ProfileImage from '@/components/ProfileImage.jsx';
 import { profiles } from '@/data/profiles.js';
-import { notFound } from 'next/navigation';
 
 export const instant = false;
+
+function findProfile(username) {
+  return profiles.find((item) => item.username === username);
+}
 
 export function generateStaticParams() {
   return profiles.map((profile) => ({ username: profile.username }));
 }
 
+export async function generateMetadata({ params }) {
+  const { username } = await params;
+  const profile = findProfile(username);
+
+  if (profile === undefined) {
+    return {};
+  }
+
+  return {
+    title: `${profile.name}(@${profile.username})`,
+    description: `게시물 ${profile.postCount}개, 팔로워 ${profile.followerCount}명, 팔로우 ${profile.followingCount}명`,
+  };
+}
+
 export default async function ProfilePage({ params }) {
   const { username } = await params;
-
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  const profile = profiles.find((item) => item.username === username);
-
+  const profile = findProfile(username);
 
   if (profile === undefined) {
     notFound();
