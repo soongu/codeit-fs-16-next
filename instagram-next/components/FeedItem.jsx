@@ -7,6 +7,7 @@ import FeedItemContent from './FeedItemContent.jsx';
 import FeedItemComments from './FeedItemComments.jsx';
 import CommentForm from './CommentForm.jsx';
 import CommentArea from './CommentArea.jsx';
+import Image from 'next/image';
 
 const FeedItem = ({
   postId,
@@ -29,9 +30,11 @@ const FeedItem = ({
 
       <div className={styles.imageContainer}>
         <div className={carousel.carouselSlide}>
-          <img
+          <Image
             src={postImage}
             alt={postAlt}
+            width={600}
+            height={600}
           />
         </div>
       </div>
