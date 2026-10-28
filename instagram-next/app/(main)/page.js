@@ -5,6 +5,8 @@ import styles from '@/components/FeedList.module.scss';
 import FeedList from '@/components/FeedList.jsx';
 import FeedSkeleton from '@/components/FeedSkeleton.jsx';
 
+// throw new Error('게시물 목록을 받아 오지 못했어요');
+
 export default function Home() {
   return (
     <main className={page.mainContent}>

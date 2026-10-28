@@ -6,7 +6,7 @@ import { posts } from '@/data/posts.js';
 
 const FeedList = async () => {
   await connection();
-  throw new Error('게시물 목록을 받아 오지 못했어요');
+  // throw new Error('게시물 목록을 받아 오지 못했어요');
 
   return (
     <div className={styles.feedList}>
