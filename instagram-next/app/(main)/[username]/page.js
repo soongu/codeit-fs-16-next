@@ -6,6 +6,10 @@ import { profiles } from '@/data/profiles.js';
 
 export const instant = false;
 
+export function generateStaticParams() {
+  return profiles.map((profile) => ({ username: profile.username }));
+}
+
 export default async function ProfilePage({ params }) {
   const { username } = await params;
   const profile = profiles.find((item) => item.username === username);
