@@ -15,6 +15,7 @@ export default function LoginPage() {
           height={1234}
           // style={{ height: 'auto' }}
           sizes='24vw'
+          loading="eager"
         />
       </div>
 

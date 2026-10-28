@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import styles from './FeedItem.module.scss';
 import { FaEllipsis } from 'react-icons/fa6';
+import Image from 'next/image';
+
 const FeedItemHeader = ({
   username,
   profileImage = 'https://picsum.photos/seed/default/40/40',
@@ -13,9 +15,11 @@ const FeedItemHeader = ({
           href={`/${username}`}
           className={styles.profileLink}>
           <div className={styles.profileImage}>
-            <img
+            <Image
               src={profileImage}
               alt={`${username}의 프로필`}
+              width={40}
+              height={40}
             />
           </div>
         </Link>
