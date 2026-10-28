@@ -1,5 +1,9 @@
 // ~/instagram-next/components/FeedItemActions.jsx
+'use client';
+
+import { useState } from 'react';
 import {
+  FaHeart,
   FaRegBookmark,
   FaRegComment,
   FaRegHeart,
@@ -8,14 +12,25 @@ import {
 import styles from './FeedItem.module.scss';
 
 const FeedItemActions = ({ likeCount }) => {
+  const [like, setLike] = useState({ liked: false, count: likeCount });
+
+  const handleLike = () => {
+    setLike({
+      ...like,
+      liked: !like.liked,
+      count: like.liked ? like.count - 1 : like.count + 1,
+    });
+  };
+
   return (
     <div className={styles.actions}>
       <div className={styles.actionButtons}>
         <div className={styles.leftButtons}>
           <button
             type='button'
-            className={styles.actionButton}>
-            <FaRegHeart />
+            className={styles.actionButton}
+            onClick={handleLike}>
+            {like.liked ? <FaHeart className={styles.liked} /> : <FaRegHeart />}
           </button>
           <button
             type='button'
@@ -35,7 +50,7 @@ const FeedItemActions = ({ likeCount }) => {
         </button>
       </div>
       <div className={styles.likes}>
-        좋아요 <span>{likeCount.toLocaleString()}</span>개
+        좋아요 <span>{like.count.toLocaleString()}</span>개
       </div>
     </div>
   );
