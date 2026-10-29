@@ -21,6 +21,7 @@ const FeedList = async () => {
           content={post.content}
           createdAt={post.createdAt}
           likeCount={post.likeCount}
+          liked={post.liked}
           commentCount={post.commentCount}
           isFirst={index === 0}
         />

@@ -18,6 +18,7 @@ const FeedItem = ({
   content,
   createdAt,
   likeCount,
+  liked,
   commentCount,
   isFirst
 }) => {
@@ -36,7 +37,7 @@ const FeedItem = ({
             alt={postAlt}
             width={600}
             height={600}
-            loading={isFirst ? "eager" : "lazy"}
+            loading={isFirst ? 'eager' : 'lazy'}
           />
         </div>
       </div>
@@ -44,6 +45,7 @@ const FeedItem = ({
       <FeedItemActions
         postId={postId}
         likeCount={likeCount}
+        liked={liked}
       />
 
       <div className={styles.content}>

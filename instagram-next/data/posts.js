@@ -13,6 +13,7 @@ export const posts = [
     content: '퇴근길에 한강이 너무 예뻤어요',
     createdAt: minutesBefore(12),
     likeCount: 130,
+    liked: false,
     commentCount: 3,
   },
   {
@@ -24,6 +25,7 @@ export const posts = [
     content: '오늘 아침에 구운 크루아상',
     createdAt: minutesBefore(45),
     likeCount: 512,
+    liked: false,
     commentCount: 4,
   },
   {
@@ -35,6 +37,7 @@ export const posts = [
     content: '주말마다 여기 옵니다',
     createdAt: minutesBefore(180),
     likeCount: 76,
+    liked: false,
     commentCount: 2,
   },
 ];
