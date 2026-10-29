@@ -2,6 +2,7 @@
 import '@/styles/global.scss';
 
 export const metadata = {
+  metadataBase: new URL(process.env.SITE_URL),
   title: {
     default: 'Instagram',
     template: '%s • Instagram',
