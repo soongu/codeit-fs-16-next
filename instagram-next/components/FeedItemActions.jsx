@@ -13,7 +13,7 @@ import styles from './FeedItem.module.scss';
 
 const FeedItemActions = ({ postId, likeCount }) => {
   const [like, setLike] = useState(() => {
-    const saved = localStorage.getItem(`like-${postId}`);
+    const saved = typeof window !== "undefined" ? localStorage.getItem(`like-${postId}`) : null;
     return saved ? JSON.parse(saved) : { liked: false, count: likeCount };
   });
 
