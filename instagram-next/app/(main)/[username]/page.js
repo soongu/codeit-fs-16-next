@@ -1,5 +1,5 @@
 // ~/instagram-next/app/(main)/[username]/page.js
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import styles from '@/components/ProfilePage.module.scss';
 import ProfileImage from '@/components/ProfileImage.jsx';
 import { profiles } from '@/data/profiles.js';
@@ -30,6 +30,11 @@ export async function generateMetadata({ params }) {
 
 export default async function ProfilePage({ params }) {
   const { username } = await params;
+
+  if (username !== username.toLowerCase()) {
+    redirect(`/${username.toLowerCase()}`);
+  }
+
   const profile = findProfile(username);
 
   if (profile === undefined) {

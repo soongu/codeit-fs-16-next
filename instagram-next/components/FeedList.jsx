@@ -6,6 +6,8 @@ import { posts } from '@/data/posts.js';
 
 const FeedList = async () => {
   await connection();
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   // throw new Error('게시물 목록을 받아 오지 못했어요');
 
   return (
