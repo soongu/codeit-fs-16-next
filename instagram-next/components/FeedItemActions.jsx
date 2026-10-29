@@ -1,6 +1,7 @@
 // ~/instagram-next/components/FeedItemActions.jsx
 'use client';
 
+import { useTransition } from 'react';
 import {
   FaHeart,
   FaRegBookmark,
@@ -12,14 +13,16 @@ import styles from './FeedItem.module.scss';
 import { likePost, unlikePost } from '@/app/actions.js';
 
 const FeedItemActions = ({ postId, likeCount, liked }) => {
-  
+  const [isPending, startTransition] = useTransition();
 
-  const handleLike = async () => {
-    if (liked) {
-      await unlikePost(postId);
-    } else {
-      await likePost(postId);
-    }
+  const handleLike = () => {
+    startTransition(async () => {
+      if (liked) {
+        await unlikePost(postId);
+      } else {
+        await likePost(postId);
+      }
+    });
   };
 
   return (
@@ -29,7 +32,9 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
           <button
             type='button'
             className={styles.actionButton}
-            onClick={handleLike}>
+            onClick={handleLike}
+            disabled={isPending}
+            aria-busy={isPending}>
             {liked ? <FaHeart className={styles.liked} /> : <FaRegHeart />}
           </button>
           <button
