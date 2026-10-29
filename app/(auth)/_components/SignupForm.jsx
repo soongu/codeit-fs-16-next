@@ -2,10 +2,28 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import styles from "./SignupPage.module.scss";
 import { signupSchema, PHONE } from "./signupSchema.js";
 import { useDuplicateCheck } from "./useDuplicateCheck.js";
+
+async function signup(form) {
+  const response = await fetch("/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form),
+  });
+  const body = await response.json();
+
+  // 409·400 이면 서버가 보낸 문장을 그대로 에러로 던진다.
+  if (!response.ok) {
+    throw new Error(body.message);
+  }
+
+  return body;
+}
 
 // 입력칸 하나 — 칸마다 같은 마크업을 되풀이하지 않으려고 컴포넌트로 뗐다.
 function SignupField({ type, name, placeholder, value, onChange, error, checked = true }) {
@@ -36,6 +54,8 @@ function SignupField({ type, name, placeholder, value, onChange, error, checked 
 }
 
 export default function SignupForm() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     emailOrPhone: "",
     name: "",
@@ -62,8 +82,22 @@ export default function SignupForm() {
   const canSubmit =
     result.success && contactCheck?.available === true && usernameCheck?.available === true;
 
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: signup,
+    // 가입이 끝나면 로그인 화면으로 간다.
+    onSuccess: () => router.push("/login"),
+    // 중복 확인을 통과한 뒤에 누가 먼저 가입했을 수 있다 — 칸마다 다시 묻게 한다.
+    onError: () => queryClient.invalidateQueries({ queryKey: ["check-duplicate"] }),
+  });
+
+  const handleSubmit = (event) => {
+    // 브라우저가 폼을 주소에 실어 보내는 기본 동작을 막고, 우리가 직접 보낸다.
+    event.preventDefault();
+    mutate(form);
+  };
+
   return (
-    <form className={styles.authForm} noValidate>
+    <form className={styles.authForm} onSubmit={handleSubmit} noValidate>
       <SignupField
         type="email"
         name="emailOrPhone"
@@ -104,7 +138,9 @@ export default function SignupForm() {
         <a href="#">더 알아보기</a>
       </p>
 
-      <button type="submit" className={styles.authButton} disabled={!canSubmit}>
+      {error && <span className={styles.errorMessage}>{error.message}</span>}
+
+      <button type="submit" className={styles.authButton} disabled={!canSubmit || isPending}>
         가입
       </button>
     </form>
