@@ -4,14 +4,15 @@
 import { useState } from "react";
 import { z } from "zod";
 import styles from "./SignupPage.module.scss";
-import { signupSchema } from "./signupSchema.js";
+import { signupSchema, PHONE } from "./signupSchema.js";
+import { useDuplicateCheck } from "./useDuplicateCheck.js";
 
 // 입력칸 하나 — 칸마다 같은 마크업을 되풀이하지 않으려고 컴포넌트로 뗐다.
-function SignupField({ type, name, placeholder, value, onChange, error }) {
-  // 아무것도 안 친 칸은 빨간색도 초록색도 아니다.
+function SignupField({ type, name, placeholder, value, onChange, error, checked = true }) {
+  // 아무것도 안 친 칸은 빨간색도 초록색도 아니다. 서버의 답을 기다리는 칸도 아직 초록이 아니다.
   const typed = value !== "";
   const failed = typed && error !== undefined;
-  const passed = typed && error === undefined;
+  const passed = typed && error === undefined && checked;
 
   return (
     <div
@@ -52,6 +53,15 @@ export default function SignupForm() {
   const result = signupSchema.safeParse(form);
   const errors = result.success ? {} : z.flattenError(result.error).fieldErrors;
 
+  const contactType = PHONE.test(form.emailOrPhone.trim()) ? "phone" : "email";
+  const contactCheck = useDuplicateCheck(contactType, form.emailOrPhone, !errors.emailOrPhone);
+  const usernameCheck = useDuplicateCheck("username", form.username, !errors.username);
+
+  // 규칙은 통과했는데 누가 이미 쓰고 있으면 서버가 준 문장을 보여 준다.
+  const takenMessage = (check) => (check?.available === false ? check.message : undefined);
+  const canSubmit =
+    result.success && contactCheck?.available === true && usernameCheck?.available === true;
+
   return (
     <form className={styles.authForm} noValidate>
       <SignupField
@@ -60,7 +70,8 @@ export default function SignupForm() {
         placeholder="휴대폰 번호 또는 이메일 주소"
         value={form.emailOrPhone}
         onChange={handleChange}
-        error={errors.emailOrPhone?.[0]}
+        error={errors.emailOrPhone?.[0] ?? takenMessage(contactCheck)}
+        checked={contactCheck !== undefined}
       />
       <SignupField
         type="text"
@@ -76,7 +87,8 @@ export default function SignupForm() {
         placeholder="사용자 이름"
         value={form.username}
         onChange={handleChange}
-        error={errors.username?.[0]}
+        error={errors.username?.[0] ?? takenMessage(usernameCheck)}
+        checked={usernameCheck !== undefined}
       />
       <SignupField
         type="password"
@@ -92,7 +104,7 @@ export default function SignupForm() {
         <a href="#">더 알아보기</a>
       </p>
 
-      <button type="submit" className={styles.authButton} disabled={!result.success}>
+      <button type="submit" className={styles.authButton} disabled={!canSubmit}>
         가입
       </button>
     </form>
