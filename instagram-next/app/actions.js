@@ -4,8 +4,18 @@
 import { refresh } from 'next/cache';
 import { posts } from '@/data/posts.js';
 
-export async function likePost(postId) {
+function findPost(postId) {
   const post = posts.find((item) => item.id === postId);
+
+  if (post === undefined) {
+    throw new Error(`${postId}번 게시물은 없어요`);
+  }
+
+  return post;
+}
+
+export async function likePost(postId) {
+  const post = findPost(postId);
 
   if (!post.liked) {
     post.liked = true;
@@ -16,7 +26,7 @@ export async function likePost(postId) {
 }
 
 export async function unlikePost(postId) {
-  const post = posts.find((item) => item.id === postId);
+  const post = findPost(postId);
 
   if (post.liked) {
     post.liked = false;
