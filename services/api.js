@@ -1,7 +1,15 @@
 // ~/instagram-next/services/api.js
 
 // 우리 서버에 보내는 요청은 모두 이 함수를 지나간다.
-export async function request(path, options) {
+export async function request(path, { method, body } = {}) {
+  const options = { method };
+
+  // 보낼 값이 있으면 JSON 글자로 바꾸고, 본문이 JSON 이라는 것을 헤더로 알린다.
+  if (body !== undefined) {
+    options.headers = { "Content-Type": "application/json" };
+    options.body = JSON.stringify(body);
+  }
+
   const response = await fetch(`/api${path}`, options);
 
   if (!response.ok) {

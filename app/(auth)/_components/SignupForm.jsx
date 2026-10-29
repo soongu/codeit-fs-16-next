@@ -8,21 +8,10 @@ import { z } from "zod";
 import styles from "./SignupPage.module.scss";
 import { signupSchema, PHONE } from "./signupSchema.js";
 import { useDuplicateCheck } from "./useDuplicateCheck.js";
+import { request } from "@/services/api.js";
 
-async function signup(form) {
-  const response = await fetch("/api/auth/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
-  });
-  const body = await response.json();
-
-  // 409·400 이면 서버가 보낸 문장을 그대로 에러로 던진다.
-  if (!response.ok) {
-    throw new Error(body.message);
-  }
-
-  return body;
+function signup(form) {
+  return request("/auth/signup", { method: "POST", body: form });
 }
 
 // 입력칸 하나 — 칸마다 같은 마크업을 되풀이하지 않으려고 컴포넌트로 뗐다.

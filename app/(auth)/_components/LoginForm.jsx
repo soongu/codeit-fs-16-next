@@ -8,11 +8,7 @@ import styles from "./LoginPage.module.scss";
 import { request } from "@/services/api.js";
 
 function login(form) {
-  return request("/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
-  });
+  return request("/auth/login", { method: "POST", body: form });
 }
 
 export default function LoginForm() {
