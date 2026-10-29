@@ -1,7 +1,7 @@
 // ~/instagram-next/services/api.js
 
-// 우리 서버에 보내는 요청은 모두 이 함수를 지나간다.
-export async function request(path, { method, params, body } = {}) {
+// 우리 서버에 보내는 요청은 모두 이 함수를 지나간다 — 화면은 이 함수 대신 아래 서비스 객체를 부른다.
+async function request(path, { method, params, body } = {}) {
   // 쿼리 문자열은 URLSearchParams 로 만든다 — 값에 든 & # + 도 글자 그대로 서버에 간다.
   const query = params === undefined ? "" : `?${new URLSearchParams(params)}`;
   const options = { method };
@@ -23,3 +23,19 @@ export async function request(path, { method, params, body } = {}) {
 
   return response.json();
 }
+
+export const authApi = {
+  login: (form) => request("/auth/login", { method: "POST", body: form }),
+  signup: (form) => request("/auth/signup", { method: "POST", body: form }),
+  checkDuplicate: (type, value) => request("/auth/check-duplicate", { params: { type, value } }),
+};
+
+export const postApi = {
+  getPage: (params) => request("/posts", { params }),
+  likePost: (id, userId) => request(`/posts/${id}/likes/${userId}`, { method: "PUT" }),
+  unlikePost: (id, userId) => request(`/posts/${id}/likes/${userId}`, { method: "DELETE" }),
+};
+
+export const memberApi = {
+  search: (keyword) => request("/members/search", { params: { keyword } }),
+};

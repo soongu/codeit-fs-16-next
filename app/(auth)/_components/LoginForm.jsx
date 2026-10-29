@@ -5,11 +5,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import styles from "./LoginPage.module.scss";
-import { request } from "@/services/api.js";
-
-function login(form) {
-  return request("/auth/login", { method: "POST", body: form });
-}
+import { authApi } from "@/services/api.js";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -21,7 +17,7 @@ export default function LoginForm() {
   });
 
   const { mutate, isPending, error, reset } = useMutation({
-    mutationFn: login,
+    mutationFn: authApi.login,
     // 로그인이 끝나면 피드로 간다.
     onSuccess: () => router.push("/"),
   });
