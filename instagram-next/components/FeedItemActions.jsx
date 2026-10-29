@@ -11,18 +11,21 @@ import {
 } from 'react-icons/fa6';
 import styles from './FeedItem.module.scss';
 
-const FeedItemActions = ({ likeCount }) => {
-  const [like, setLike] = useState({ liked: false, count: likeCount });
+const FeedItemActions = ({ postId, likeCount }) => {
+  const [like, setLike] = useState(() => {
+    const saved = localStorage.getItem(`like-${postId}`);
+    return saved ? JSON.parse(saved) : { liked: false, count: likeCount };
+  });
+
 
   const handleLike = () => {
-
-    console.log('좋아요 버튼에서 읽은 주소:', process.env.NEXT_PUBLIC_SITE_URL);
-
-    setLike({
+    const next = {
       ...like,
       liked: !like.liked,
       count: like.liked ? like.count - 1 : like.count + 1,
-    });
+    };
+    localStorage.setItem(`like-${postId}`, JSON.stringify(next));
+    setLike(next);
   };
 
   return (
