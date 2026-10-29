@@ -15,6 +15,9 @@ const FeedItemActions = ({ likeCount }) => {
   const [like, setLike] = useState({ liked: false, count: likeCount });
 
   const handleLike = () => {
+
+    console.log('좋아요 버튼에서 읽은 주소:', process.env.NEXT_PUBLIC_SITE_URL);
+
     setLike({
       ...like,
       liked: !like.liked,

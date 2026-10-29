@@ -1,4 +1,5 @@
 // ~/instagram-next/app/(main)/layout.js
+import { CreateFeedModalProvider } from '@/components/CreateFeedModalContext.jsx';
 import Sidebar from '@/components/Sidebar.jsx';
 
 export default function MainLayout({ children }) {
@@ -7,8 +8,10 @@ export default function MainLayout({ children }) {
 
   return (
     <>
-      <Sidebar />
-      {children}
+      <CreateFeedModalProvider>
+        <Sidebar />
+        {children}
+      </CreateFeedModalProvider>
     </>
   );
 }
