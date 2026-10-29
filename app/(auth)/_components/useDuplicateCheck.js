@@ -1,15 +1,10 @@
 // ~/instagram-next/app/(auth)/_components/useDuplicateCheck.js
 import { useQuery } from "@tanstack/react-query";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue.js";
+import { request } from "@/services/api.js";
 
-async function checkDuplicate(type, value) {
-  const response = await fetch(`/api/auth/check-duplicate?${new URLSearchParams({ type, value })}`);
-
-  if (!response.ok) {
-    throw new Error(`중복 확인을 하지 못했어요 (${response.status})`);
-  }
-
-  return response.json();
+function checkDuplicate(type, value) {
+  return request("/auth/check-duplicate", { params: { type, value } });
 }
 
 // 규칙을 통과한 값이면 서버에 «누가 이미 쓰고 있나» 를 묻는다 — 입력이 0.5초 멈춘 뒤에만.

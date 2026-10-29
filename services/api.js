@@ -1,7 +1,9 @@
 // ~/instagram-next/services/api.js
 
 // 우리 서버에 보내는 요청은 모두 이 함수를 지나간다.
-export async function request(path, { method, body } = {}) {
+export async function request(path, { method, params, body } = {}) {
+  // 쿼리 문자열은 URLSearchParams 로 만든다 — 값에 든 & # + 도 글자 그대로 서버에 간다.
+  const query = params === undefined ? "" : `?${new URLSearchParams(params)}`;
   const options = { method };
 
   // 보낼 값이 있으면 JSON 글자로 바꾸고, 본문이 JSON 이라는 것을 헤더로 알린다.
@@ -10,7 +12,7 @@ export async function request(path, { method, body } = {}) {
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`/api${path}`, options);
+  const response = await fetch(`/api${path}${query}`, options);
 
   if (!response.ok) {
     // 백엔드에 닿지 못하면 Next.js 서버가 JSON 이 아닌 글자로 답한다 — 읽지 못하면 null 로 둔다.

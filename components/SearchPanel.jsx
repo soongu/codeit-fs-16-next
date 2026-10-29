@@ -7,16 +7,11 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { FaTimes } from "react-icons/fa";
 import { useUiStore } from "@/stores/useUiStore.js";
+import { request } from "@/services/api.js";
 import styles from "./SearchPanel.module.scss";
 
-async function searchMembers(keyword) {
-  const response = await fetch(`/api/members/search?keyword=${keyword}`);
-
-  if (!response.ok) {
-    throw new Error(`사람을 찾지 못했어요 (${response.status})`);
-  }
-
-  return response.json();
+function searchMembers(keyword) {
+  return request("/members/search", { params: { keyword } });
 }
 
 export default function SearchPanel() {
