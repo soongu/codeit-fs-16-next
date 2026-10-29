@@ -1,5 +1,6 @@
 // ~/instagram-next/app/layout.js
 import '@/styles/global.scss';
+import { CreateFeedModalProvider } from '@/components/CreateFeedModalContext.jsx';
 
 export const metadata = {
   metadataBase: new URL(process.env.SITE_URL),
@@ -18,7 +19,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang='ko'>
       <body>
-        {children}
+        <CreateFeedModalProvider>{children}</CreateFeedModalProvider>
       </body>
     </html>
   );
