@@ -84,8 +84,8 @@ export default function SignupForm() {
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: signup,
-    // 가입이 끝나면 로그인 화면으로 간다.
-    onSuccess: () => router.push("/login"),
+    // 가입이 끝나면 방금 가입한 사용자 이름을 주소에 실어 로그인 화면으로 간다.
+    onSuccess: (data) => router.push(`/login?${new URLSearchParams({ username: data.username })}`),
     // 중복 확인을 통과한 뒤에 누가 먼저 가입했을 수 있다 — 칸마다 다시 묻게 한다.
     onError: () => queryClient.invalidateQueries({ queryKey: ["check-duplicate"] }),
   });

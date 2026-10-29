@@ -1,4 +1,5 @@
 // ~/instagram-next/app/(auth)/login/page.js
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import layoutStyles from "../_components/AuthLayout.module.scss";
@@ -27,7 +28,10 @@ export default function LoginPage() {
 
       <div className={layoutStyles.authFormContainer}>
         <AuthCard showLogo={true}>
-          <LoginForm />
+          {/* 주소의 ?username= 은 요청이 와야 알 수 있다 — 폼만 Suspense 로 감싼다. */}
+          <Suspense>
+            <LoginForm />
+          </Suspense>
         </AuthCard>
 
         <AuthCard className={styles.signupCard}>
