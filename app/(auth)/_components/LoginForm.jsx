@@ -5,21 +5,14 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import styles from "./LoginPage.module.scss";
+import { request } from "@/services/api.js";
 
-async function login(form) {
-  const response = await fetch("/api/auth/login", {
+function login(form) {
+  return request("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(form),
   });
-  const body = await response.json();
-
-  // 401 이면 서버가 보낸 문장을 그대로 에러로 던진다.
-  if (!response.ok) {
-    throw new Error(body.message);
-  }
-
-  return body;
 }
 
 export default function LoginForm() {
