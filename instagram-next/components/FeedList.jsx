@@ -2,11 +2,12 @@
 import { connection } from 'next/server';
 import styles from './FeedList.module.scss';
 import FeedItem from './FeedItem.jsx';
-import { posts } from '@/data/posts.js';
+import { getPosts } from '@/data/posts.js';
 
 const FeedList = async () => {
+
   await connection();
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const posts = await getPosts();
 
   // throw new Error('게시물 목록을 받아 오지 못했어요');
 

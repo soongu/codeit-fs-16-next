@@ -2,13 +2,9 @@
 import { notFound, redirect } from 'next/navigation';
 import styles from '@/components/ProfilePage.module.scss';
 import ProfileImage from '@/components/ProfileImage.jsx';
-import { profiles } from '@/data/profiles.js';
+import { profiles, getProfile } from '@/data/profiles.js';
 
 export const instant = false;
-
-function findProfile(username) {
-  return profiles.find((item) => item.username === username);
-}
 
 export function generateStaticParams() {
   return profiles.map((profile) => ({ username: profile.username }));
@@ -16,7 +12,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const { username } = await params;
-  const profile = findProfile(username);
+  const profile = await getProfile(username);
 
   if (profile === undefined) {
     return {};
@@ -35,7 +31,7 @@ export default async function ProfilePage({ params }) {
     redirect(`/${username.toLowerCase()}`);
   }
 
-  const profile = findProfile(username);
+  const profile = await getProfile(username);
 
   if (profile === undefined) {
     notFound();
