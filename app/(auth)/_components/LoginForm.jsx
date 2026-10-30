@@ -33,8 +33,8 @@ export default function LoginForm() {
 
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.login,
-    // 로그인이 끝나면 피드로 간다.
-    onSuccess: () => router.push("/"),
+    // 로그인이 끝나면 보던 곳(없으면 피드)으로 간다.
+    onSuccess: () => router.push(searchParams.get("next") ?? "/"),
   });
 
   const handleChange = (event) => {
