@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import styles from "./LoginPage.module.scss";
 import { authApi, ApiError } from "@/services/api.js";
 
@@ -25,6 +25,7 @@ function errorText(error) {
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     // 가입하고 넘어왔으면 주소의 ?username= 으로 첫 값을 채운다.
     username: searchParams.get("username") ?? "",
@@ -33,8 +34,12 @@ export default function LoginForm() {
 
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.login,
-    // 로그인이 끝나면 보던 곳(없으면 피드)으로 간다.
-    onSuccess: () => router.push(searchParams.get("next") ?? "/"),
+    onSuccess: (user) => {
+      // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 화면 전체가 곧바로 새 사람을 본다.
+      queryClient.setQueryData(["me"], user);
+      // 보던 곳(없으면 피드)으로 간다.
+      router.push(searchParams.get("next") ?? "/");
+    },
   });
 
   const handleChange = (event) => {
