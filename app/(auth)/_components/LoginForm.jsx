@@ -23,6 +23,17 @@ function errorText(error) {
   return "로그인하지 못했어요. 잠시 뒤에 다시 시도해 주세요.";
 }
 
+// ?next= 로 받은 주소 — 우리 사이트 안의 주소일 때만 쓰고, 아니면 피드로 간다.
+function nextPath(next) {
+  // 주소로 읽을 수 없는 값(// · https:// 처럼)이면 new URL 이 에러를 던진다 — 그때도 피드로 간다.
+  if (next === null || !URL.canParse(next, window.location.origin)) {
+    return "/";
+  }
+
+  const url = new URL(next, window.location.origin);
+  return url.origin === window.location.origin ? url.pathname + url.search : "/";
+}
+
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -44,7 +55,7 @@ export default function LoginForm() {
   // data 로 보면 안 된다 — 세션이 풀려 401 이 와도 앞서 받아 둔 사람이 data 에 남아 있다.
   useEffect(() => {
     if (isLoggedIn) {
-      router.replace(searchParams.get("next") ?? "/");
+      router.replace(nextPath(searchParams.get("next")));
     }
   }, [isLoggedIn, router, searchParams]);
 
