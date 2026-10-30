@@ -1,11 +1,12 @@
 // ~/instagram-next/app/(auth)/_components/LoginForm.jsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import styles from "./LoginPage.module.scss";
 import { authApi, ApiError } from "@/services/api.js";
+import { useMe } from "@/hooks/useMe.js";
 
 // 실패했을 때 보여 줄 문장은 화면이 고른다.
 function errorText(error) {
@@ -26,6 +27,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const { isSuccess: isLoggedIn } = useMe();
   const [form, setForm] = useState({
     // 가입하고 넘어왔으면 주소의 ?username= 으로 첫 값을 채운다.
     username: searchParams.get("username") ?? "",
@@ -34,13 +36,17 @@ export default function LoginForm() {
 
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (user) => {
-      // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 화면 전체가 곧바로 새 사람을 본다.
-      queryClient.setQueryData(["me"], user);
-      // 보던 곳(없으면 피드)으로 간다.
-      router.push(searchParams.get("next") ?? "/");
-    },
+    // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 그러면 아래 effect 가 보던 곳으로 보낸다.
+    onSuccess: (user) => queryClient.setQueryData(["me"], user),
   });
+
+  // «나는 누구»가 성공했으면 로그인 화면에 있을 까닭이 없다 — 보던 곳(없으면 피드)으로 보낸다.
+  // data 로 보면 안 된다 — 세션이 풀려 401 이 와도 앞서 받아 둔 사람이 data 에 남아 있다.
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace(searchParams.get("next") ?? "/");
+    }
+  }, [isLoggedIn, router, searchParams]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
