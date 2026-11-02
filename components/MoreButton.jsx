@@ -44,7 +44,14 @@ export default function MoreButton() {
 
       {isOpen && (
         <div className={styles.moreMenu}>
-          <button className={styles.menuItem} onClick={() => logout()}>
+          <button
+            className={styles.menuItem}
+            onClick={() => {
+              // 이 메뉴도 숨겨진 채 남는다 — 닫고 나서 로그아웃한다.
+              setIsOpen(false);
+              logout();
+            }}
+          >
             <span>로그아웃</span>
           </button>
         </div>

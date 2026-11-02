@@ -47,8 +47,12 @@ export default function LoginForm() {
 
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.login,
-    // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 그러면 아래 effect 가 보던 곳으로 보낸다.
-    onSuccess: (user) => queryClient.setQueryData(["me"], user),
+    onSuccess: (user) => {
+      // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 그러면 아래 effect 가 보던 곳으로 보낸다.
+      queryClient.setQueryData(["me"], user);
+      // 이 화면은 떠난 뒤에도 숨겨진 채 남는다 — 다음 사람이 보지 않게 입력값을 비운다.
+      setForm({ username: "", password: "" });
+    },
   });
 
   // «나는 누구»가 성공했으면 로그인 화면에 있을 까닭이 없다 — 보던 곳(없으면 피드)으로 보낸다.
