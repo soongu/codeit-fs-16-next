@@ -15,5 +15,6 @@ export function useNotifications() {
   return useQuery({
     queryKey: ['notifications'],
     queryFn: getNotifications,
+    staleTime: 30 * 1000,
   });
 }
