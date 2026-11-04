@@ -11,3 +11,6 @@ Content-Type: application/json
 {
   "text": "yuna 님이 회원님을 팔로우하기 시작했습니다."
 }
+
+### 1번 알림 읽음
+PATCH http://localhost:3000/p3-13/api/notifications/1/read
