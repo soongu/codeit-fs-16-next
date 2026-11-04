@@ -4,9 +4,11 @@
 import { useNotifications } from './useNotifications.js';
 
 export default function NotificationList() {
-  const { notifications, isLoading, error } = useNotifications();
+  
 
-  if (isLoading) {
+  const { data, isPending, error } = useNotifications();
+
+  if (isPending) {
     return <p className='mt-4'>불러오는 중…</p>;
   }
 
@@ -16,7 +18,7 @@ export default function NotificationList() {
 
   return (
     <ul className='mt-4 space-y-2'>
-      {notifications.map((item) => (
+      {data.map((item) => (
         <li
           key={item.id}
           className={item.isRead ? 'text-gray-400' : ''}>
