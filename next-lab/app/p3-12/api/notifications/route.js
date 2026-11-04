@@ -6,3 +6,12 @@ export async function GET() {
 
   return Response.json(notifications);
 }
+
+export async function POST(request) {
+  const { text } = await request.json();
+  const notification = { id: notifications.length + 1, text, isRead: false };
+
+  notifications.push(notification);
+
+  return Response.json(notification, { status: 201 });
+}

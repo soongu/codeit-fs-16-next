@@ -1,0 +1,18 @@
+### 알림 목록
+GET http://localhost:3000/p3-12/api/notifications
+
+### 새 알림 보내기
+POST http://localhost:3000/p3-12/api/notifications
+Content-Type: application/json
+
+{
+  "text": "yuna 님이 회원님을 팔로우하기 시작했습니다."
+}
+
+### 알림 하나 더 보내기
+POST http://localhost:3000/p3-12/api/notifications
+Content-Type: application/json
+
+{
+  "text": "hana 님이 회원님의 사진을 좋아합니다."
+}
