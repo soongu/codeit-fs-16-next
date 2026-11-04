@@ -1,5 +1,6 @@
 // ~/instagram-next/app/layout.js
 import '@/styles/global.scss';
+import QueryProvider from '@/components/QueryProvider.jsx';
 import { CreateFeedModalProvider } from '@/components/CreateFeedModalContext.jsx';
 
 export const metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang='ko'>
       <body>
-        <CreateFeedModalProvider>{children}</CreateFeedModalProvider>
+        <QueryProvider>
+          <CreateFeedModalProvider>{children}</CreateFeedModalProvider>
+        </QueryProvider>
       </body>
     </html>
   );
