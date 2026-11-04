@@ -30,10 +30,6 @@ export default function NotificationList() {
     return <p className='mt-4'>불러오는 중…</p>;
   }
 
-  if (data === undefined) {
-    return <p className='mt-4'>{error.message}</p>;
-  }
-
   return (
     <>
       {error && (

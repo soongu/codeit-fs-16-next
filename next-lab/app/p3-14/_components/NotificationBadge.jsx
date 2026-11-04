@@ -3,22 +3,20 @@
 
 import { useNotifications } from './useNotifications.js';
 
+function countUnread(notifications) {
+  return notifications.filter((item) => !item.isRead).length;
+}
+
 export default function NotificationBadge() {
-  const { data, isPending, isFetching } = useNotifications();
+  const { data, isPending, isFetching } = useNotifications(countUnread);
 
   if (isPending) {
     return <p className='font-semibold'>읽지 않은 알림 …</p>;
   }
 
-  if (data === undefined) {
-    return <p className='font-semibold'>알림을 확인하지 못했어요</p>;
-  }
-
-  const unread = data.filter((item) => !item.isRead).length;
-
   return (
     <p className='font-semibold'>
-      읽지 않은 알림 {unread}개{isFetching && ' · 새로 확인하는 중'}
+      읽지 않은 알림 {data}개{isFetching && ' · 새로 확인하는 중'}
     </p>
   );
 }

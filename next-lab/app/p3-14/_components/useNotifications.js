@@ -11,11 +11,13 @@ async function getNotifications() {
   return response.json();
 }
 
-export function useNotifications() {
+export function useNotifications(select) {
   return useQuery({
     queryKey: ['notifications'],
     queryFn: getNotifications,
     staleTime: 30 * 1000,
-    retry: 1
+    retry: 1,
+    throwOnError: (error, query) => query.state.data === undefined,
+    select,
   });
 }
