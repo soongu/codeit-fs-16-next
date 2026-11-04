@@ -17,8 +17,7 @@ async function readNotification(id) {
 }
 
 export default function NotificationList() {
-  const { data, isPending, error } = useNotifications();
-
+  const { data, isPending, isFetching, error, refetch } = useNotifications();
   const queryClient = useQueryClient();
   const readOne = useMutation({
     mutationFn: readNotification,
@@ -31,31 +30,44 @@ export default function NotificationList() {
     return <p className='mt-4'>불러오는 중…</p>;
   }
 
-  if (error) {
+  if (data === undefined) {
     return <p className='mt-4'>{error.message}</p>;
   }
 
-
   return (
-    <ul className='mt-4 space-y-2'>
-      {data.map((item) => (
-        <li
-          key={item.id}
-          className={item.isRead ? 'text-gray-400' : ''}>
-          {item.text}
-          {!item.isRead && (
-            <button
-              type='button'
-              className='ml-2 rounded border px-2'
-              onClick={() => readOne.mutate(item.id)}
-              disabled={readOne.isPending}>
-              {readOne.isPending && readOne.variables === item.id
-                ? '보내는 중…'
-                : '읽음'}
-            </button>
-          )}
-        </li>
-      ))}
-    </ul>
+    <>
+      {error && (
+        <p className='mt-4 text-red-500'>
+          알림을 새로 받지 못했어요. 아래는 그전에 받은 알림이에요.
+          <button
+            type='button'
+            className='ml-2 rounded border px-2'
+            onClick={() => refetch()}
+            disabled={isFetching}>
+            {isFetching ? '받는 중…' : '다시 시도'}
+          </button>
+        </p>
+      )}
+      <ul className='mt-4 space-y-2'>
+        {data.map((item) => (
+          <li
+            key={item.id}
+            className={item.isRead ? 'text-gray-400' : ''}>
+            {item.text}
+            {!item.isRead && (
+              <button
+                type='button'
+                className='ml-2 rounded border px-2'
+                onClick={() => readOne.mutate(item.id)}
+                disabled={readOne.isPending}>
+                {readOne.isPending && readOne.variables === item.id
+                  ? '보내는 중…'
+                  : '읽음'}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }

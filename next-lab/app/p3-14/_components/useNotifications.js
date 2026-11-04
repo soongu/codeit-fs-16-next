@@ -16,6 +16,6 @@ export function useNotifications() {
     queryKey: ['notifications'],
     queryFn: getNotifications,
     staleTime: 30 * 1000,
-    gcTime: 10 * 1000
+    retry: 1
   });
 }
