@@ -24,6 +24,18 @@ export function useNotifications() {
     };
 
     load();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        load();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
   }, []);
 
   return { notifications, isLoading, error };
