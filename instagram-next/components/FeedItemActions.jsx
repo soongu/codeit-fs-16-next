@@ -29,8 +29,7 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: changeLike,
     onMutate: async (variables) => {
-
-      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ['posts'] });
       const previousPosts = queryClient.getQueryData(['posts']);
 
       queryClient.setQueryData(['posts'], (posts) =>
@@ -47,11 +46,14 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
 
       return { previousPosts };
     },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
     onError: (error, variables, onMutateResult) => {
       queryClient.setQueryData(['posts'], onMutateResult.previousPosts);
       console.error(error);
     },
-    onSuccess: async () => {
+    onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
   });
