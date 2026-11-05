@@ -10,9 +10,10 @@ import {
   FaRegPaperPlane,
 } from 'react-icons/fa6';
 import styles from './FeedItem.module.scss';
+import { MY_USER_ID } from '@/utils/me.js';
 
 async function changeLike({ postId, liked }) {
-  const response = await fetch(`/api/posts/${postId}/likes`, {
+  const response = await fetch(`/api/posts/${postId}/likes/${MY_USER_ID}`, {
     method: liked ? 'PUT' : 'DELETE',
   });
 
@@ -32,17 +33,21 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
       await queryClient.cancelQueries({ queryKey: ['posts'] });
       const previousPosts = queryClient.getQueryData(['posts']);
 
-      queryClient.setQueryData(['posts'], (posts) =>
-        posts.map((post) =>
-          post.id === variables.postId
-            ? {
-                ...post,
-                liked: variables.liked,
-                likeCount: post.likeCount + (variables.liked ? 1 : -1),
-              }
-            : post,
-        ),
-      );
+      queryClient.setQueryData(['posts'], (data) => ({
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          items: page.items.map((post) =>
+            post.id === variables.postId
+              ? {
+                  ...post,
+                  liked: variables.liked,
+                  likeCount: post.likeCount + (variables.liked ? 1 : -1),
+                }
+              : post,
+          ),
+        })),
+      }));
 
       return { previousPosts };
     },

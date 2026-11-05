@@ -1,0 +1,8 @@
+### jaehoon(2번)이 보는 상품
+GET http://localhost:3002/p3-17/practice1/api?userId=2
+
+### dahye(1번)가 보는 상품
+GET http://localhost:3002/p3-17/practice1/api?userId=1
+
+### 누가 보는지 모를 때
+GET http://localhost:3002/p3-17/practice1/api

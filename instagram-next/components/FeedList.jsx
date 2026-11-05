@@ -8,13 +8,15 @@ import stateStyles from './StatusMessage.module.scss';
 import FeedItem from './FeedItem.jsx';
 import FeedSkeleton from './FeedSkeleton.jsx';
 
+import { MY_USER_ID } from '@/utils/me.js';
+
 const PER_PAGE = 2;
 
 async function getPostPage({ pageParam }) {
   const condition = pageParam
     ? `limit=${PER_PAGE}&cursor=${pageParam}`
     : `limit=${PER_PAGE}`;
-  const response = await fetch(`/api/posts?${condition}`);
+  const response = await fetch(`/api/posts?userId=${MY_USER_ID}&${condition}`);
 
   if (!response.ok) {
     throw new Error(`게시물을 불러오지 못했어요 (${response.status})`);
