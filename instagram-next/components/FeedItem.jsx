@@ -8,20 +8,30 @@ import FeedItemComments from './FeedItemComments.jsx';
 import CommentForm from './CommentForm.jsx';
 import CommentArea from './CommentArea.jsx';
 import Image from 'next/image';
+import Carousel from './Carousel.jsx';
+import { useLikePost } from '@/hooks/useLikePost.js';
 
 const FeedItem = ({
   postId,
   username,
   profileImage,
-  postImage,
+  imageUrls,
   postAlt,
   content,
   createdAt,
   likeCount,
   liked,
   commentCount,
-  isFirst
+  isFirst,
 }) => {
+  const { mutate, isPending } = useLikePost();
+
+  // 사진을 두 번 누르는 것은 «누르기» 만 한다 — 이미 눌렀거나 보내는 중이면 보내지 않는다.
+  const likeByDoubleClick = () => {
+    if (liked || isPending) return;
+    mutate({ postId, liked: true });
+  };
+
   return (
     <article className={styles.post}>
       <FeedItemHeader
@@ -31,15 +41,12 @@ const FeedItem = ({
       />
 
       <div className={styles.imageContainer}>
-        <div className={carousel.carouselSlide}>
-          <Image
-            src={postImage}
-            alt={postAlt}
-            width={600}
-            height={600}
-            loading={isFirst ? 'eager' : 'lazy'}
-          />
-        </div>
+        <Carousel
+          imageUrls={imageUrls}
+          alt={postAlt}
+          isFirst={isFirst}
+          onImageDoubleClick={likeByDoubleClick}
+        />
       </div>
 
       <FeedItemActions
@@ -62,6 +69,6 @@ const FeedItem = ({
       </CommentArea>
     </article>
   );
-};
+};;
 
 export default FeedItem;
