@@ -28,7 +28,9 @@ const FeedItemActions = ({ postId, likeCount, liked }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: changeLike,
-    onMutate: (variables) => {
+    onMutate: async (variables) => {
+
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
       const previousPosts = queryClient.getQueryData(['posts']);
 
       queryClient.setQueryData(['posts'], (posts) =>
