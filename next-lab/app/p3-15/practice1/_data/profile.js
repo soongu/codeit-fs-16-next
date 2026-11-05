@@ -3,4 +3,5 @@ export const profile = {
   username: 'minji',
   name: '김민지',
   followerCount: 8500,
+  following: false,
 };

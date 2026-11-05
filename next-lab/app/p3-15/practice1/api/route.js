@@ -7,9 +7,3 @@ export async function GET() {
   return Response.json(profile);
 }
 
-export async function POST() {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  profile.followerCount += 1;
-
-  return Response.json(profile);
-}

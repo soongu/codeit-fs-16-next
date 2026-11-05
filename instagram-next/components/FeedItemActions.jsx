@@ -25,8 +25,30 @@ async function changeLike({ postId, liked }) {
 
 const FeedItemActions = ({ postId, likeCount, liked }) => {
   const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
     mutationFn: changeLike,
+    onMutate: (variables) => {
+      const previousPosts = queryClient.getQueryData(['posts']);
+
+      queryClient.setQueryData(['posts'], (posts) =>
+        posts.map((post) =>
+          post.id === variables.postId
+            ? {
+                ...post,
+                liked: variables.liked,
+                likeCount: post.likeCount + (variables.liked ? 1 : -1),
+              }
+            : post,
+        ),
+      );
+
+      return { previousPosts };
+    },
+    onError: (error, variables, onMutateResult) => {
+      queryClient.setQueryData(['posts'], onMutateResult.previousPosts);
+      console.error(error);
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['posts'] });
     },

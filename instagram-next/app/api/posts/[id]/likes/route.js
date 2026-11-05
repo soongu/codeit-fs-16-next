@@ -8,6 +8,9 @@ function findPost(id) {
 export async function PUT(request, { params }) {
   const { id } = await params;
   await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return Response.json({ message: '서버에 문제가 생겼어요' }, { status: 500 });
+
   const post = findPost(id);
 
   if (post === undefined) {
