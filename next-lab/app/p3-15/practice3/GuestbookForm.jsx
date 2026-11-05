@@ -28,9 +28,25 @@ export default function GuestbookForm() {
   const queryClient = useQueryClient();
   const { mutate, isPending, error, reset } = useMutation({
     mutationFn: addEntry,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["guestbook"] });
-      setText("");
+    onMutate: async (text) => {
+      await queryClient.cancelQueries({ queryKey: ['guestbook'] });
+      const previousEntries = queryClient.getQueryData(['guestbook']);
+
+      queryClient.setQueryData(['guestbook'], (entries) => [
+        ...entries,
+        { id: Date.now(), text, pending: true },
+      ]);
+
+      return { previousEntries };
+    },
+    onError: (error, text, onMutateResult) => {
+      queryClient.setQueryData(['guestbook'], onMutateResult.previousEntries);
+    },
+    onSuccess: () => {
+      setText('');
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['guestbook'] });
     },
   });
 
