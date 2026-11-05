@@ -37,6 +37,12 @@ const FeedList = () => {
     initialPageParam: null,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.items[lastPage.items.length - 1].id : null,
+
+    // 1. 탭 이동시 무분별한 재요청 차단
+    staleTime: 10 * 60 * 1000, // 10분간 fresh 유지
+    refetchOnWindowFocus: false, // 창 포커스 이동시 자동 refetch 비활성화
+
+    maxPages: 5, // 아무리 많이 스크롤해도 메모리에는 5페이지까지만 저장해
   });
 
   console.log('data:', data);
