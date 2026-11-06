@@ -78,7 +78,7 @@ export default function SearchPanel() {
   }
 
   return (
-    <div className={`${styles.searchPanel}${isOpen ? styles.open : ''}`}>
+    <div className={`${styles.searchPanel} ${isOpen ? styles.open : ''}`}>
       <div className={styles.header}>
         <h2>검색</h2>
       </div>
