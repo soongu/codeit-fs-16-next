@@ -26,6 +26,9 @@ async function getPostPage({ pageParam }) {
 }
 
 const FeedList = () => {
+
+  console.log('[render] FeedList');
+
   const {
     data,
     isPending,
@@ -47,7 +50,7 @@ const FeedList = () => {
     maxPages: 5, // 아무리 많이 스크롤해도 메모리에는 5페이지까지만 저장해
   });
 
-  console.log('data:', data);
+  
 
   const loaderRef = useRef(null);
 
@@ -88,7 +91,7 @@ const FeedList = () => {
   }
 
   const posts = data.pages.flatMap((page) => page.items);
-  console.log('posts:', posts);
+  
 
   return (
     <>

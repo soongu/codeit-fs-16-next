@@ -6,6 +6,9 @@ import { useOpenCreateFeedModal } from './CreateFeedModalContext.jsx';
 import styles from './Sidebar.module.scss';
 
 export default function CreateButton() {
+
+  console.log('[render] CreateButton');
+
   const open = useOpenCreateFeedModal();
 
   return (

@@ -7,6 +7,9 @@ import CreateFeedModal from './CreateFeedModal.jsx';
 const CreateFeedModalContext = createContext(null);
 
 export function CreateFeedModalProvider({ children }) {
+  
+  console.log('[render] CreateFeedModalProvider');
+  
   const [isOpen, setIsOpen] = useState(false);
   const open = () => setIsOpen(true);
 
