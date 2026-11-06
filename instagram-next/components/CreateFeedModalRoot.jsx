@@ -9,6 +9,7 @@ export default function CreateFeedModalRoot() {
   const isOpen = useUiStore((state) => state.isCreateFeedOpen);
   const close = useUiStore((state) => state.closeCreateFeed);
 
+
   if (!isOpen) {
     return null;
   }
