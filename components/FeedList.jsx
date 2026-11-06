@@ -33,8 +33,8 @@ const FeedList = () => {
       // 누가 보는지 알기 전에는 보내지 않는다.
       enabled: me !== undefined,
       initialPageParam: null,
-      getNextPageParam: (lastPage) =>
-        lastPage.hasNext ? lastPage.items[lastPage.items.length - 1].id : null,
+      // 서버가 준 커서를 그대로 돌려준다 — 끝이면 null 이 와서 다음 페이지가 없다.
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
     });
   const loaderRef = useRef(null);
 
