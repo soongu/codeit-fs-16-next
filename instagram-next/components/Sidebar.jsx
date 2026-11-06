@@ -1,6 +1,4 @@
 // ~/instagram-next/components/Sidebar.jsx
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaHouse } from 'react-icons/fa6';
@@ -10,17 +8,15 @@ import CreateButton from './CreateButton.jsx';
 import SearchButton from './SearchButton.jsx';
 import SearchPanel from './SearchPanel.jsx';
 import styles from './Sidebar.module.scss';
-import { useUiStore } from '@/stores/useUiStore.js';
+import SidebarNav from './SidebarNav.jsx';
 
 function Sidebar() {
 
   console.log('[render] Sidebar');
-  const isSearchOpen = useUiStore((state) => state.isSearchOpen);
 
   return (
     <>
-      <nav
-        className={`${styles.sidebar} ${isSearchOpen ? styles.collapsed : ''}`}>
+      <SidebarNav>
         <div className={styles.logoContainer}>
           <Link
             href='/'
@@ -55,7 +51,7 @@ function Sidebar() {
             <span className={styles.menuText}>프로필</span>
           </NavLink>
         </div>
-      </nav>
+      </SidebarNav>
 
       <SearchPanel />
     </>
