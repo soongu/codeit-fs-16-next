@@ -14,7 +14,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-icons": "^5.7.0",
-    "sass": "^1.106.1"
+    "sass": "^1.106.1",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
     "eslint": "^9",

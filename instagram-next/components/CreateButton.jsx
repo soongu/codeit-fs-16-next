@@ -2,14 +2,14 @@
 'use client';
 
 import { FaRegSquarePlus } from 'react-icons/fa6';
-import { useOpenCreateFeedModal } from './CreateFeedModalContext.jsx';
+import { useUiStore } from '@/stores/useUiStore.js';
 import styles from './Sidebar.module.scss';
 
 export default function CreateButton() {
 
   console.log('[render] CreateButton');
 
-  const open = useOpenCreateFeedModal();
+  const open = useUiStore((state) => state.openCreateFeed);
 
   return (
     <button
