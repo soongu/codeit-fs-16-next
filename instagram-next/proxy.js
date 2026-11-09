@@ -9,7 +9,7 @@ export function proxy(request) {
     return NextResponse.redirect(new URL(pathname.toLowerCase(), request.url));
   }
 
-  if (pathname === '/login' || pathname.includes('.')) {
+  if (pathname === '/login' || pathname === "/signup" || pathname.includes('.')) {
     return;
   }
 

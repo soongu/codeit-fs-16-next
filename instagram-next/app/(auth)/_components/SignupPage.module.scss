@@ -1,6 +1,6 @@
 // ~/instagram-next/app/(auth)/_components/SignupPage.module.scss
 
-@use "./AuthForm.module.scss";
+@use './AuthForm.module.scss';
 
 /* 회원가입 페이지 특화 스타일 */
 
@@ -30,7 +30,6 @@
   margin: 8px 0;
 }
 
-
 .privacyText {
   color: #737373;
   font-size: 12px;
@@ -42,9 +41,7 @@
     color: #385185;
     text-decoration: none;
   }
-
 }
-
 
 .loginCard {
   p {
@@ -58,4 +55,3 @@
     font-weight: 600;
   }
 }
-

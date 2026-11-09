@@ -3,7 +3,7 @@ import InstagramLogo from '@/components/InstagramLogo.jsx';
 import styles from './AuthCard.module.scss';
 
 const AuthCard = ({ children, className = '', showLogo = false }) => (
-  <div className={`${styles.authCard}${className}`}>
+  <div className={`${styles.authCard} ${className}`}>
     {showLogo && (
       <h1 className={styles.logo}>
         <InstagramLogo />
