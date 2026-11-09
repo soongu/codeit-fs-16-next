@@ -3,6 +3,7 @@ import layoutStyles from '../_components/AuthLayout.module.scss';
 import styles from '../_components/LoginPage.module.scss';
 import AuthCard from '../_components/AuthCard.jsx';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const metadata = {
   title: '로그인',
@@ -19,7 +20,7 @@ export default function LoginPage() {
           height={1234}
           // style={{ height: 'auto' }}
           sizes='24vw'
-          loading="eager"
+          loading='eager'
         />
       </div>
 
@@ -51,6 +52,12 @@ export default function LoginPage() {
               로그인
             </button>
           </form>
+        </AuthCard>
+
+        <AuthCard className={styles.signupCard}>
+          <p>
+            계정이 없으신가요? <Link href='/signup'>가입하기</Link>
+          </p>
         </AuthCard>
       </div>
     </>
