@@ -9,6 +9,10 @@ const nextConfig = {
         source: '/api/posts/:path*',
         destination: `${process.env.API_URL}/api/posts/:path*`,
       },
+      {
+        source: '/api/auth/:path*',
+        destination: `${process.env.API_URL}/api/auth/:path*`,
+      },
     ];
   },
   images: {
