@@ -7,9 +7,9 @@ import { useMutation } from '@tanstack/react-query';
 import styles from './LoginPage.module.scss';
 
 async function login(form) {
-  const response = await fetch('http://localhost:3000/api/auth/login', {
+  const response = await fetch('/api/auth/login', {
     method: 'POST',
-    credentials: 'include',
+    // credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(form),
   });
