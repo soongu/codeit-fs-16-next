@@ -20,7 +20,8 @@ async function request(path, { method, params, body } = {}) {
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(`/api${path}${query}`, options);
+  // 새 주소(/api/v2)로 보낸다 — 성공한 응답은 봉투({ data })에 담겨 온다.
+  const response = await fetch(`/api/v2${path}${query}`, options);
 
   if (!response.ok) {
     // 백엔드에 닿지 못하면 Next.js 서버가 JSON 이 아닌 글자로 답한다 — 읽지 못하면 null 로 둔다.
@@ -29,7 +30,9 @@ async function request(path, { method, params, body } = {}) {
     throw new ApiError(response.status, data?.message ?? `요청을 처리하지 못했어요 (${response.status})`);
   }
 
-  return response.json();
+  // 봉투에서 값만 꺼내 돌려준다 — 화면 쪽 코드는 봉투를 몰라도 된다.
+  const { data } = await response.json();
+  return data;
 }
 
 export const authApi = {
