@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MY_USER_ID } from '@/utils/me.js';
+import { postApi } from '@/services/api.js';
+
 // 받아 둔 페이지들을 돌며 게시물 하나만 바꾼 새 데이터를 만든다.
 // change 는 그 게시물을 받아 바꿀 필드만 돌려주는 함수다.
 function changePost(data, postId, change) {
@@ -14,16 +16,9 @@ function changePost(data, postId, change) {
   };
 }
 
-async function changeLike({ postId, liked }) {
-  const response = await fetch(`/api/posts/${postId}/likes/${MY_USER_ID}`, {
-    method: liked ? 'PUT' : 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error(`좋아요를 바꾸지 못했어요 (${response.status})`);
-  }
-
-  return response.json();
+// liked 는 «바꾸고 싶은» 상태 — 켜려면 누르기, 끄려면 취소.
+function changeLike({ postId, liked }) {
+  return liked ? postApi.likePost(postId, MY_USER_ID) : postApi.unlikePost(postId, MY_USER_ID);
 }
 
 export function useLikePost() {

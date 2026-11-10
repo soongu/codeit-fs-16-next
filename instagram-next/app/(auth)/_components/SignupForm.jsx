@@ -9,23 +9,7 @@ import { z } from 'zod';
 import styles from './SignupPage.module.scss';
 import { signupSchema, PHONE } from './signupSchema.js';
 import { useDuplicateCheck } from './useDuplicateCheck.js';
-
-
-async function signup(form) {
-  const response = await fetch('/api/auth/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(form),
-  });
-  const body = await response.json();
-
-  // 409·400 이면 서버가 보낸 문장을 그대로 에러로 던진다.
-  if (!response.ok) {
-    throw new Error(body.message);
-  }
-
-  return body;
-}
+import { authApi } from '@/services/api.js';
 
 
 // 입력칸 하나 — 칸마다 같은 마크업을 되풀이하지 않으려고 컴포넌트로 뗐다.
@@ -76,7 +60,7 @@ export default function SignupForm() {
 
 
   const { mutate, isPending, error } = useMutation({
-    mutationFn: signup,
+    mutationFn: authApi.signup,
     // 가입이 끝나면 로그인 화면으로 간다.
     onSuccess: (data) =>
       router.push(`/login?${new URLSearchParams({ username: data.username })}`),

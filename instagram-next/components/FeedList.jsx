@@ -9,20 +9,19 @@ import FeedItem from './FeedItem.jsx';
 import FeedSkeleton from './FeedSkeleton.jsx';
 
 import { MY_USER_ID } from '@/utils/me.js';
+import { postApi } from '@/services/api.js';
 
 const PER_PAGE = 2;
 
-async function getPostPage({ pageParam }) {
-  const condition = pageParam
-    ? `limit=${PER_PAGE}&cursor=${pageParam}`
-    : `limit=${PER_PAGE}`;
-  const response = await fetch(`/api/posts?userId=${MY_USER_ID}&${condition}`);
+function getPostPage({ pageParam }) {
+  const params = { userId: MY_USER_ID, limit: PER_PAGE };
 
-  if (!response.ok) {
-    throw new Error(`게시물을 불러오지 못했어요 (${response.status})`);
+  // 첫 페이지에는 커서가 없다 — null 을 그대로 넣으면 주소에 cursor=null 이라는 글자가 실린다.
+  if (pageParam !== null) {
+    params.cursor = pageParam;
   }
 
-  return response.json();
+  return postApi.getPage(params);
 }
 
 const FeedList = () => {
