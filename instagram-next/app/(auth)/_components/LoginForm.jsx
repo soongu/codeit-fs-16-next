@@ -2,31 +2,21 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import styles from './LoginPage.module.scss';
+import { request } from '@/services/api.js';
 
 async function login(form) {
-  const response = await fetch('/api/auth/login', {
-    method: 'POST',
-    // credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(form),
-  });
-  const body = await response.json();
-
-  // 401 이면 서버가 보낸 문장을 그대로 에러로 던진다.
-  if (!response.ok) {
-    throw new Error(body.message);
-  }
-
-  return body;
+  return request('/auth/login', { method: 'POST', body: form });
 }
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({
-    username: '',
+    // 가입하고 넘어왔으면 주소의 ?username= 으로 첫 값을 채운다.
+    username: searchParams.get('username') ?? '',
     password: '',
   });
 

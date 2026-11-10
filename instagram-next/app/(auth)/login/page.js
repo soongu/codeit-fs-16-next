@@ -5,6 +5,7 @@ import AuthCard from '../_components/AuthCard.jsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoginForm from '../_components/LoginForm.jsx';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: '로그인',
@@ -27,7 +28,9 @@ export default function LoginPage() {
 
       <div className={layoutStyles.authFormContainer}>
         <AuthCard showLogo={true}>
-          <LoginForm />
+          <Suspense>
+            <LoginForm />
+          </Suspense>
         </AuthCard>
 
         <AuthCard className={styles.signupCard}>
