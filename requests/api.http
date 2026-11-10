@@ -11,7 +11,7 @@ GET http://localhost:3001/api/profiles/kimchi
 GET http://localhost:3001/api/comments
 
 ### 이름에 mi가 든 사람
-GET http://localhost:3001/api/members/search?keyword=mi
+GET http://localhost:3001/api/v2/members/search?keyword=mi
 
 ### 검색어 없이
-GET http://localhost:3001/api/members/search
+GET http://localhost:3001/api/v2/members/search
