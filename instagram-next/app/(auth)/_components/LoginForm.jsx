@@ -1,11 +1,23 @@
 // ~/instagram-next/app/(auth)/_components/LoginForm.jsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styles from './LoginPage.module.scss';
 import { authApi, ApiError } from '@/services/api.js';
+import { useMe } from '@/hooks/useMe.js';
+
+// ?next= 로 받은 주소 — 우리 사이트 안의 주소일 때만 쓰고, 아니면 피드로 간다.
+function nextPath(next) {
+  // 주소로 읽을 수 없는 값(// · https:// 처럼)이면 new URL 이 에러를 던진다 — 그때도 피드로 간다.
+  if (next === null || !URL.canParse(next, window.location.origin)) {
+    return "/";
+  }
+
+  const url = new URL(next, window.location.origin);
+  return url.origin === window.location.origin ? url.pathname + url.search : "/";
+}
 
 // 실패했을 때 보여 줄 문장은 화면이 고른다.
 function errorText(error) {
@@ -26,6 +38,8 @@ export default function LoginForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
+  const { isSuccess: isLoggedIn } = useMe();
+
   const [form, setForm] = useState({
     // 가입하고 넘어왔으면 주소의 ?username= 으로 첫 값을 채운다.
     username: searchParams.get('username') ?? '',
@@ -38,9 +52,15 @@ export default function LoginForm() {
     onSuccess: (user) => {
       // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 화면 전체가 곧바로 새 사람을 본다.
       queryClient.setQueryData(['me'], user);
-      router.push(searchParams.get('next') ?? '/');
     },
   });
+
+  // 로그인한 사람이면 로그인 화면에 있을 까닭이 없다 — 보던 곳(없으면 피드)으로 보낸다.
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace(nextPath(searchParams.get('next')));
+    }
+  }, [isLoggedIn, router, searchParams]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
