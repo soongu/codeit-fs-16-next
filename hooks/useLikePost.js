@@ -2,9 +2,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postApi } from "@/services/api.js";
 
-// liked 는 «바꾸고 싶은» 상태 — 켜려면 누르기, 끄려면 취소.
-function changeLike(userId, { postId, liked }) {
-  return liked ? postApi.likePost(postId, userId) : postApi.unlikePost(postId, userId);
+// liked 는 «바꾸고 싶은» 상태 — 켜려면 누르기, 끄려면 취소. 누가 누르는지는 서버가 로그인 정보로 정한다.
+function changeLike({ postId, liked }) {
+  return liked ? postApi.likePost(postId) : postApi.unlikePost(postId);
 }
 
 // 받아 둔 페이지들을 돌며 게시물 하나만 바꾼 새 데이터를 만든다.
@@ -19,14 +19,14 @@ function changePost(data, postId, change) {
   };
 }
 
-// userId 는 지금 보는 사람 — 목록을 받은 FeedList 가 카드에 내려 준다.
+// userId 는 지금 보는 사람 — 목록을 받은 FeedList 가 카드에 내려 준다. 캐시 키를 맞추는 데만 쓴다.
 export function useLikePost(userId) {
   const queryClient = useQueryClient();
   // 피드 목록과 같은 키 — 보는 사람의 번호까지 맞아야 같은 캐시다.
   const postsKey = ["posts", userId];
 
   return useMutation({
-    mutationFn: (variables) => changeLike(userId, variables),
+    mutationFn: changeLike,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: postsKey });
       const previousPosts = queryClient.getQueryData(postsKey);
