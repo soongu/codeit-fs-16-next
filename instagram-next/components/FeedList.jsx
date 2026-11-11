@@ -28,10 +28,6 @@ const FeedList = () => {
 
   const { data: me } = useMe();
 
-  const postsKey = ['posts', me?.id];
-
-  console.log('postsKey', postsKey);
-
   const {
     data,
     isPending,
@@ -40,7 +36,7 @@ const FeedList = () => {
     isFetchingNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: postsKey,
+    queryKey: ['posts', me?.id],
     queryFn: ({ pageParam }) => getPostPage(me.id, pageParam),
     // 누가 보는지 알기 전에는 보내지 않는다.
     enabled: me !== undefined,

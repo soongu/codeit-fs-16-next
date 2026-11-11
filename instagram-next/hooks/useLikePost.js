@@ -28,7 +28,6 @@ export function useLikePost(userId) {
   const queryClient = useQueryClient();
   // 피드 목록과 같은 키 — 보는 사람의 번호까지 맞아야 같은 캐시다.
   const postsKey = ['posts', userId];
-  console.log('postsKey', postsKey);
 
   return useMutation({
     mutationFn: (variables) => changeLike(userId, variables),

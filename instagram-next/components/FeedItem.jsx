@@ -1,13 +1,11 @@
 // ~/instagram-react/src/components/FeedItem.jsx
 import styles from './FeedItem.module.scss';
-import carousel from './Carousel.module.scss';
 import FeedItemHeader from './FeedItemHeader.jsx';
 import FeedItemActions from './FeedItemActions.jsx';
 import FeedItemContent from './FeedItemContent.jsx';
 import FeedItemComments from './FeedItemComments.jsx';
 import CommentForm from './CommentForm.jsx';
 import CommentArea from './CommentArea.jsx';
-import Image from 'next/image';
 import Carousel from './Carousel.jsx';
 import { useLikePost } from '@/hooks/useLikePost.js';
 
@@ -26,8 +24,6 @@ const FeedItem = ({
   viewerId
 }) => {
 
-  console.log('viewerId:', viewerId);
-  console.log('viewerId:', typeof viewerId);
 
   const { mutate, isPending } = useLikePost(viewerId);
 
