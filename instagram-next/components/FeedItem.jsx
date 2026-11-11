@@ -23,8 +23,13 @@ const FeedItem = ({
   liked,
   commentCount,
   isFirst,
+  viewerId
 }) => {
-  const { mutate, isPending } = useLikePost();
+
+  console.log('viewerId:', viewerId);
+  console.log('viewerId:', typeof viewerId);
+
+  const { mutate, isPending } = useLikePost(viewerId);
 
   // 사진을 두 번 누르는 것은 «누르기» 만 한다 — 이미 눌렀거나 보내는 중이면 보내지 않는다.
   const likeByDoubleClick = () => {
@@ -53,6 +58,7 @@ const FeedItem = ({
         postId={postId}
         likeCount={likeCount}
         liked={liked}
+        viewerId={viewerId}
       />
 
       <div className={styles.content}>

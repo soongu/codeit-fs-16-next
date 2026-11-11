@@ -8,13 +8,13 @@ import stateStyles from './StatusMessage.module.scss';
 import FeedItem from './FeedItem.jsx';
 import FeedSkeleton from './FeedSkeleton.jsx';
 
-import { MY_USER_ID } from '@/utils/me.js';
 import { postApi } from '@/services/api.js';
+import { useMe } from '@/hooks/useMe.js';
 
 const PER_PAGE = 2;
 
-function getPostPage({ pageParam }) {
-  const params = { userId: MY_USER_ID, limit: PER_PAGE };
+function getPostPage(userId, pageParam) {
+  const params = { userId, limit: PER_PAGE };
 
   // 첫 페이지에는 커서가 없다 — null 을 그대로 넣으면 주소에 cursor=null 이라는 글자가 실린다.
   if (pageParam !== null) {
@@ -26,7 +26,11 @@ function getPostPage({ pageParam }) {
 
 const FeedList = () => {
 
-  console.log('[render] FeedList');
+  const { data: me } = useMe();
+
+  const postsKey = ['posts', me?.id];
+
+  console.log('postsKey', postsKey);
 
   const {
     data,
@@ -36,8 +40,10 @@ const FeedList = () => {
     isFetchingNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ['posts'],
-    queryFn: getPostPage,
+    queryKey: postsKey,
+    queryFn: ({ pageParam }) => getPostPage(me.id, pageParam),
+    // 누가 보는지 알기 전에는 보내지 않는다.
+    enabled: me !== undefined,
     initialPageParam: null,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.items[lastPage.items.length - 1].id : null,
@@ -112,6 +118,7 @@ const FeedList = () => {
             liked={post.liked}
             commentCount={post.commentCount}
             isFirst={index === 0}
+            viewerId={me.id}
           />
         ))}
       </div>

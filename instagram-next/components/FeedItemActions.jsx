@@ -13,9 +13,9 @@ import { useLikePost } from '@/hooks/useLikePost.js';
 
 
 
-const FeedItemActions = ({ postId, likeCount, liked }) => {
+const FeedItemActions = ({ postId, likeCount, liked, viewerId }) => {
   
-  const { mutate, isPending } = useLikePost();
+  const { mutate, isPending } = useLikePost(viewerId);
 
   return (
     <div className={styles.actions}>
