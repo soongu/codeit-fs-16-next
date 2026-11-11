@@ -41,6 +41,7 @@ export const authApi = {
   checkDuplicate: (type, value) =>
     request('/auth/check-duplicate', { params: { type, value } }),
   me: () => request('/auth/me'),
+  logout: () => request('/auth/logout', { method: 'POST' }),
 };
 
 export const postApi = {

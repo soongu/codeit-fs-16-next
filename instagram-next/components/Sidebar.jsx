@@ -9,6 +9,7 @@ import SearchPanel from './SearchPanel.jsx';
 import styles from './Sidebar.module.scss';
 import SidebarNav from './SidebarNav.jsx';
 import ProfileLink from './ProfileLink.jsx';
+import MoreButton from './MoreButton.jsx';
 
 function Sidebar() {
 
@@ -38,6 +39,10 @@ function Sidebar() {
           <CreateButton />
 
           <ProfileLink />
+        </div>
+
+        <div className={styles.bottomMenu}>
+          <MoreButton />
         </div>
       </SidebarNav>
 

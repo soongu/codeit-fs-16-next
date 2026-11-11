@@ -52,6 +52,8 @@ export default function LoginForm() {
     onSuccess: (user) => {
       // 로그인 응답의 사용자로 «나는 누구»를 채워 둔다 — 화면 전체가 곧바로 새 사람을 본다.
       queryClient.setQueryData(['me'], user);
+      // 이 화면은 떠난 뒤에도 숨겨진 채 남는다 — 다음 사람이 보지 않게 입력값을 비운다.
+      setForm({ username: '', password: '' });
     },
   });
 
