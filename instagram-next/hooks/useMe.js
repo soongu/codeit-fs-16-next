@@ -1,6 +1,6 @@
 // ~/instagram-next/hooks/useMe.js
 import { useQuery } from '@tanstack/react-query';
-import { authApi } from '@/services/api.js';
+import { authApi, ApiError } from '@/services/api.js';
 
 // 서버가 4xx 로 답했으면 다시 보내도 같은 답이다 — 연결 실패와 5xx 만 세 번까지 다시 보낸다.
 function retryOnServerError(failureCount, error) {
