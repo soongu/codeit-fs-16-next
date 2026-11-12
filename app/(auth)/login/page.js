@@ -7,7 +7,7 @@ import styles from "../_components/LoginPage.module.scss";
 import AuthCard from "../_components/AuthCard.jsx";
 import LoginForm from "../_components/LoginForm.jsx";
 import Separator from "../_components/Separator.jsx";
-import GoogleLogin from "../_components/GoogleLogin.jsx";
+import SocialLogin from "../_components/SocialLogin.jsx";
 
 export const metadata = {
   title: "로그인",
@@ -37,9 +37,11 @@ export default function LoginPage() {
 
           <Separator />
 
-          {/* 구글 로그인 링크도 주소의 ?next= 를 읽는다 — 폼처럼 Suspense 로 감싼다. */}
+          {/* 소셜 로그인 링크도 주소의 ?next= 를 읽는다 — 폼처럼 Suspense 로 감싼다. */}
           <Suspense>
-            <GoogleLogin />
+            <SocialLogin provider="google" />
+            <SocialLogin provider="kakao" />
+            <SocialLogin provider="naver" />
           </Suspense>
         </AuthCard>
 
