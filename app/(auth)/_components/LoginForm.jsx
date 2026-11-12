@@ -27,7 +27,7 @@ function errorText(error) {
 // 주소에 적힌 글자를 그대로 보여 주지 않고, 코드로 우리 문장을 고른다.
 const SOCIAL_ERRORS = {
   EMAIL_TAKEN: "이미 가입한 이메일이에요. 사용자 이름과 비밀번호로 로그인해 주세요.",
-  SOCIAL_LOGIN_FAILED: "Google 로그인을 마치지 못했어요. 다시 시도해 주세요.",
+  SOCIAL_LOGIN_FAILED: "소셜 로그인을 마치지 못했어요. 다시 시도해 주세요.",
 };
 
 function socialErrorText(code) {
