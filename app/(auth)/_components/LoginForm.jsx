@@ -23,6 +23,22 @@ function errorText(error) {
   return "로그인하지 못했어요. 잠시 뒤에 다시 시도해 주세요.";
 }
 
+// 구글 로그인을 마치지 못하고 돌아오면 주소의 ?error= 에 에러 코드가 실려 온다.
+// 주소에 적힌 글자를 그대로 보여 주지 않고, 코드로 우리 문장을 고른다.
+const SOCIAL_ERRORS = {
+  EMAIL_TAKEN: "이미 가입한 이메일이에요. 사용자 이름과 비밀번호로 로그인해 주세요.",
+  SOCIAL_LOGIN_FAILED: "Google 로그인을 마치지 못했어요. 다시 시도해 주세요.",
+};
+
+function socialErrorText(code) {
+  if (code === null) {
+    return null;
+  }
+
+  // 표에 없는 코드가 와도 로그인하지 못한 것은 같다 — 다시 시도하라는 문장을 보여 준다.
+  return Object.hasOwn(SOCIAL_ERRORS, code) ? SOCIAL_ERRORS[code] : SOCIAL_ERRORS.SOCIAL_LOGIN_FAILED;
+}
+
 // ?next= 로 받은 주소 — 우리 사이트 안의 주소일 때만 쓰고, 아니면 피드로 간다.
 function nextPath(next) {
   // 주소로 읽을 수 없는 값(// · https:// 처럼)이면 new URL 이 에러를 던진다 — 그때도 피드로 간다.
@@ -78,6 +94,8 @@ export default function LoginForm() {
 
   // 두 칸이 모두 차야 누를 수 있다 — 로그인 화면은 규칙을 검사하지 않는다.
   const isDisabled = !form.username || !form.password || isPending;
+  // 방금 로그인이 실패했으면 그 문장을, 아니면 구글 로그인에서 돌아오며 실려 온 문장을 보여 준다.
+  const message = error ? errorText(error) : socialErrorText(searchParams.get("error"));
 
   return (
     <form className={styles.authForm} onSubmit={handleSubmit} noValidate>
@@ -104,7 +122,7 @@ export default function LoginForm() {
         />
       </div>
 
-      {error && <div className={styles.errorMessage}>{errorText(error)}</div>}
+      {message && <div className={styles.errorMessage}>{message}</div>}
       <button type="submit" className={styles.authButton} disabled={isDisabled}>
         {isPending ? "로그인 중..." : "로그인"}
       </button>
