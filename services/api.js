@@ -10,7 +10,7 @@ export class ApiError extends Error {
 }
 
 // 우리 서버에 보내는 요청은 모두 이 함수를 지나간다 — 화면은 이 함수 대신 아래 서비스 객체를 부른다.
-async function request(path, { method, params, body } = {}) {
+async function request(path, { method, params, body, retried = false } = {}) {
   // 쿼리 문자열은 URLSearchParams 로 만든다 — 값에 든 & # + 도 글자 그대로 서버에 간다.
   const query = params === undefined ? "" : `?${new URLSearchParams(params)}`;
   const options = { method };
@@ -28,6 +28,13 @@ async function request(path, { method, params, body } = {}) {
     // 백엔드에 닿지 못하면 Next.js 서버가 JSON 이 아닌 글자로 답한다 — 읽지 못하면 null 로 둔다.
     const failed = await response.json().catch(() => null);
     const error = failed?.error;
+
+    // Access 토큰의 기한만 지났으면 새 토큰을 받고, 원래 요청을 한 번만 다시 보낸다.
+    if (error?.code === "TOKEN_EXPIRED" && !retried) {
+      await request("/auth/reissue", { method: "POST" });
+      return request(path, { method, params, body, retried: true });
+    }
+
     // 서버가 보낸 문장이 있으면 그것을, 없으면 상태 코드로 만든 문장을 던진다. 에러 코드도 함께 싣는다.
     throw new ApiError(response.status, error?.message ?? `요청을 처리하지 못했어요 (${response.status})`, error?.code);
   }
