@@ -13,8 +13,8 @@ export function proxy(request) {
     return;
   }
 
-  // 로그인 쿠키가 없으면 페이지를 그리기 전에 로그인 화면으로 보낸다 — 세션이 살아 있는지는 묻지 않는다.
-  if (!request.cookies.has("sessionId")) {
+  // 로그인 쿠키가 없으면 페이지를 그리기 전에 로그인 화면으로 보낸다 — 토큰이 살아 있는지는 묻지 않는다.
+  if (!request.cookies.has("accessToken")) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
