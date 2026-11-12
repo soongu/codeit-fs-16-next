@@ -9,6 +9,20 @@ export class ApiError extends Error {
   }
 }
 
+// 지금 진행 중인 새 토큰 받기 — 요청 여럿이 한꺼번에 TOKEN_EXPIRED 를 받아도 하나만 보내고 다 같이 기다린다.
+// 같은 Refresh 토큰이 두 번 가면 서버는 이미 쓴 토큰이 다시 왔다고 보고 로그인 기록을 지운다.
+let reissuing = null;
+
+function reissue() {
+  if (reissuing === null) {
+    reissuing = request("/auth/reissue", { method: "POST" }).finally(() => {
+      reissuing = null;
+    });
+  }
+
+  return reissuing;
+}
+
 // 우리 서버에 보내는 요청은 모두 이 함수를 지나간다 — 화면은 이 함수 대신 아래 서비스 객체를 부른다.
 async function request(path, { method, params, body, retried = false } = {}) {
   // 쿼리 문자열은 URLSearchParams 로 만든다 — 값에 든 & # + 도 글자 그대로 서버에 간다.
@@ -31,7 +45,7 @@ async function request(path, { method, params, body, retried = false } = {}) {
 
     // Access 토큰의 기한만 지났으면 새 토큰을 받고, 원래 요청을 한 번만 다시 보낸다.
     if (error?.code === "TOKEN_EXPIRED" && !retried) {
-      await request("/auth/reissue", { method: "POST" });
+      await reissue();
       return request(path, { method, params, body, retried: true });
     }
 
