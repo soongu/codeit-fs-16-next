@@ -6,6 +6,8 @@ import layoutStyles from "../_components/AuthLayout.module.scss";
 import styles from "../_components/LoginPage.module.scss";
 import AuthCard from "../_components/AuthCard.jsx";
 import LoginForm from "../_components/LoginForm.jsx";
+import Separator from "../_components/Separator.jsx";
+import GoogleLogin from "../_components/GoogleLogin.jsx";
 
 export const metadata = {
   title: "로그인",
@@ -31,6 +33,13 @@ export default function LoginPage() {
           {/* 주소의 ?username= 은 요청이 와야 알 수 있다 — 폼만 Suspense 로 감싼다. */}
           <Suspense>
             <LoginForm />
+          </Suspense>
+
+          <Separator />
+
+          {/* 구글 로그인 링크도 주소의 ?next= 를 읽는다 — 폼처럼 Suspense 로 감싼다. */}
+          <Suspense>
+            <GoogleLogin />
           </Suspense>
         </AuthCard>
 
