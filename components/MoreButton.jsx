@@ -7,8 +7,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaBars } from "react-icons/fa6";
 import styles from "./Sidebar.module.scss";
 import { authApi } from "@/services/api.js";
+import SocialAccountItems from "./SocialAccountItems.jsx";
 
-// 사이드바 맨 아래 «더 보기» — 누르면 메뉴가 열리고, 메뉴에서 로그아웃한다.
+// 사이드바 맨 아래 «더 보기» — 누르면 메뉴가 열리고, 메뉴에서 소셜 계정을 잇거나 끊고, 로그아웃한다.
 export default function MoreButton() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -44,6 +45,7 @@ export default function MoreButton() {
 
       {isOpen && (
         <div className={styles.moreMenu}>
+          <SocialAccountItems onUnlink={() => setIsOpen(false)} />
           <button
             className={styles.menuItem}
             onClick={() => {

@@ -64,6 +64,8 @@ export const authApi = {
   checkDuplicate: (type, value) => request("/auth/check-duplicate", { params: { type, value } }),
   me: () => request("/auth/me"),
   logout: () => request("/auth/logout", { method: "POST" }),
+  socialAccounts: () => request("/auth/social-accounts"),
+  unlinkSocialAccount: (provider) => request(`/auth/social-accounts/${provider}`, { method: "DELETE" }),
 };
 
 export const postApi = {
