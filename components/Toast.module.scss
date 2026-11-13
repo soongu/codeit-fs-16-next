@@ -1,0 +1,39 @@
+// ~/instagram-next/components/Toast.module.scss
+.toastContainer {
+  position: fixed;
+  top: 100px; /* 위치를 좀 더 위로 올려 눈에 잘 띄게 조정 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // 좀 더 통통 튀는 애니메이션
+}
+
+.toastContent {
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+
+  /* 기본(성공/안내) */
+  background-color: #0095f6;
+  box-shadow: 0 4px 12px rgba(0, 149, 246, 0.3);
+}
+
+.toastContentError {
+  background-color: #c0392b; /* 에러: 붉은 계열 */
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.35);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 150%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}

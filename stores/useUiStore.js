@@ -10,4 +10,9 @@ export const useUiStore = create((set) => ({
   isSearchOpen: false,
   toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
   closeSearch: () => set({ isSearchOpen: false }),
+
+  // 화면 위쪽에 잠깐 띄우는 알림 — 띄운 알림이 없으면 null 이다.
+  toast: null,
+  showToast: (message, variant = "default") => set({ toast: { message, variant } }),
+  hideToast: () => set({ toast: null }),
 }));

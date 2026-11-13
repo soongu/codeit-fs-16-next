@@ -2,6 +2,7 @@
 import "@/styles/global.scss";
 import QueryProvider from "@/components/QueryProvider.jsx";
 import CreateFeedModalRoot from "@/components/CreateFeedModalRoot.jsx";
+import GlobalToast from "@/components/GlobalToast.jsx";
 
 export const metadata = {
   metadataBase: new URL(process.env.SITE_URL),
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
         <QueryProvider>
           {children}
           <CreateFeedModalRoot />
+          <GlobalToast />
         </QueryProvider>
       </body>
     </html>
