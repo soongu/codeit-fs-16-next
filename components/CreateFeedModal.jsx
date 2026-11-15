@@ -5,6 +5,7 @@ import styles from "./CreateFeedModal.module.scss";
 import CreateFeedHeader from "./CreateFeedHeader.jsx";
 import CreateFeedUpload from "./CreateFeedUpload.jsx";
 import CreateFeedWrite from "./CreateFeedWrite.jsx";
+import { uploadApi } from "@/services/api.js";
 
 const CreateFeedModal = ({ onClose }) => {
   const [step, setStep] = useState(1);
@@ -26,10 +27,10 @@ const CreateFeedModal = ({ onClose }) => {
     };
   }, [previewUrls]);
 
-  // 지금은 고른 파일과 쓴 글을 Console 에 찍기만 한다.
-  const handleShare = () => {
-    console.log("올릴 파일:", files);
-    console.log("쓴 글:", content);
+  // 지금은 사진만 올리고, 서버가 돌려준 사진 주소를 Console 에 찍는다.
+  const handleShare = async () => {
+    const { imageUrls } = await uploadApi.images(files);
+    console.log("올린 사진 주소:", imageUrls);
   };
 
   return (

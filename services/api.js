@@ -29,8 +29,12 @@ async function request(path, { method, params, body, retried = false } = {}) {
   const query = params === undefined ? "" : `?${new URLSearchParams(params)}`;
   const options = { method };
 
-  // 보낼 값이 있으면 JSON 글자로 바꾸고, 본문이 JSON 이라는 것을 헤더로 알린다.
-  if (body !== undefined) {
+  if (body instanceof FormData) {
+    // 파일은 FormData 그대로 보낸다 — Content-Type 헤더는 적지 않는다.
+    // 브라우저가 multipart/form-data 와, 파트와 파트 사이에 넣을 boundary 글자를 직접 적는다.
+    options.body = body;
+  } else if (body !== undefined) {
+    // 보낼 값이 있으면 JSON 글자로 바꾸고, 본문이 JSON 이라는 것을 헤더로 알린다.
     options.headers = { "Content-Type": "application/json" };
     options.body = JSON.stringify(body);
   }
@@ -76,4 +80,14 @@ export const postApi = {
 
 export const memberApi = {
   search: (keyword) => request("/members/search", { params: { keyword } }),
+};
+
+export const uploadApi = {
+  // 사진 파일들을 올리고, 서버가 저장한 사진의 주소 목록을 받는다.
+  // 필드 이름 images 는 서버와 정한 이름이라 화면 컴포넌트는 파일 배열만 넘기면 된다.
+  images: (files) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    return request("/uploads", { method: "POST", body: formData });
+  },
 };
