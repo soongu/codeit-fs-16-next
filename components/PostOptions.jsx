@@ -10,19 +10,20 @@ import { useUiStore } from "@/stores/useUiStore.js";
 
 // 게시물의 «…» 를 누르면 화면 위에 띄우는 메뉴 — 만들기 모달의 «삭제/취소» 확인과 같은 마크업이다.
 // 내 게시물이면 «삭제»·«수정», 관리자가 보는 남의 게시물이면 «삭제» 만 보인다. 그 밖에는 «취소» 하나다.
-const PostOptions = ({ post, onClose }) => {
+// 지운 뒤 어디로 갈지(onDeleted)는 메뉴를 띄운 쪽이 정한다 — 모달과 페이지가 다르다.
+const PostOptions = ({ post, onClose, onDeleted }) => {
   const { data: me } = useMe();
   // 지금 무엇을 보여 주나 — "menu"(메뉴) · "edit"(정보 수정) · "delete"(지우기 확인)
   const [view, setView] = useState("menu");
-  const { mutate, isPending } = useDeletePost();
+  const { mutate, isPending } = useDeletePost(me.id);
   const showToast = useUiStore((state) => state.showToast);
   const isMine = post.authorId === me.id;
   const canDelete = isMine || me.role === "ADMIN";
 
-  // 지우기 확인의 «삭제» — 지우고 나면 메뉴를 닫는다. 실패하면 알림을 띄우고 확인은 그대로 둔다.
+  // 지우기 확인의 «삭제» — 지우고 나면 onDeleted 로 지운 게시물의 화면을 떠난다. 실패하면 알림을 띄우고 확인은 그대로 둔다.
   const handleDelete = () => {
     mutate(post.id, {
-      onSuccess: onClose,
+      onSuccess: onDeleted,
       onError: (error) => {
         showToast(error instanceof ApiError ? error.message : "게시물을 삭제하지 못했어요. 다시 시도해 주세요.", "error");
       },

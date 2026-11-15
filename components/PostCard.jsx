@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import listStyles from "./FeedList.module.scss";
 import stateStyles from "./StatusMessage.module.scss";
 import FeedItem from "./FeedItem.jsx";
@@ -13,6 +14,7 @@ import { ApiError } from "@/services/api.js";
 
 // 게시물 하나를 피드 카드 한 장으로 그린다 — 카드와 그 둘레는 피드와 같은 마크업이다.
 const PostCard = ({ postId }) => {
+  const router = useRouter();
   const { data: me } = useMe();
   const { data: post, isPending, error } = usePost(postId);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -50,7 +52,14 @@ const PostCard = ({ postId }) => {
         onOpenOptions={() => setIsOptionsOpen(true)}
       />
 
-      {isOptionsOpen && <PostOptions post={post} onClose={() => setIsOptionsOpen(false)} />}
+      {/* 지우면 홈으로 간다 — replace 라서 뒤로 가기를 눌러도 지운 게시물의 주소로 돌아오지 않는다. */}
+      {isOptionsOpen && (
+        <PostOptions
+          post={post}
+          onClose={() => setIsOptionsOpen(false)}
+          onDeleted={() => router.replace("/")}
+        />
+      )}
     </div>
   );
 };

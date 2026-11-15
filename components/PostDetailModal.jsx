@@ -82,7 +82,10 @@ const PostDetailModal = ({ postId }) => {
         </div>
       </div>
 
-      {isOptionsOpen && <PostOptions post={post} onClose={() => setIsOptionsOpen(false)} />}
+      {/* 지우면 모달을 닫는다 — 한 칸 뒤(피드)로 가면 뒤의 피드에서는 이미 그 카드가 빠져 있다. */}
+      {isOptionsOpen && (
+        <PostOptions post={post} onClose={() => setIsOptionsOpen(false)} onDeleted={closeModal} />
+      )}
     </>
   );
 };
