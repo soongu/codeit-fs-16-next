@@ -11,6 +11,7 @@ import PostComments from "./PostComments.jsx";
 import PostActions from "./PostActions.jsx";
 import CommentForm from "./CommentForm.jsx";
 import PostOptions from "./PostOptions.jsx";
+import { ApiError } from "@/services/api.js";
 import { usePost } from "@/hooks/usePost.js";
 import { useMe } from "@/hooks/useMe.js";
 import { useLikePost } from "@/hooks/useLikePost.js";
@@ -19,12 +20,15 @@ import { useLikePost } from "@/hooks/useLikePost.js";
 const PostDetailModal = ({ postId }) => {
   const router = useRouter();
   const { data: me } = useMe();
-  const { data: post } = usePost(postId);
+  const { data: post, error } = usePost(postId);
   const { mutate, isPending } = useLikePost(me?.id);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
-  // 받기 전에는 아무것도 그리지 않는다.
-  if (post === undefined) return null;
+  // 다른 탭에서 지운 게시물이면 다시 받을 때 404 가 온다 — 앞에 받아 둔 게시물이 남아 있어도 그리지 않는다.
+  const isDeleted = error instanceof ApiError && error.status === 404;
+
+  // 받기 전이나 지운 게시물이면 아무것도 그리지 않는다.
+  if (post === undefined || isDeleted) return null;
 
   // ✕ 나 바깥을 누르면 한 칸 뒤로 간다 — 모달을 연 주소(피드)로 돌아가면서 모달이 닫힌다.
   const closeModal = () => router.back();

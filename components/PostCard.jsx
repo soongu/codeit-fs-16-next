@@ -27,7 +27,10 @@ const PostCard = ({ postId }) => {
     );
   }
 
-  if (post === undefined) {
+  // 다른 탭에서 지운 게시물이면 다시 받을 때 404 가 온다 — 앞에 받아 둔 게시물이 남아 있어도 서버 문장을 보여 준다.
+  const isDeleted = error instanceof ApiError && error.status === 404;
+
+  if (post === undefined || isDeleted) {
     // 응답을 받았으면 request() 가 만든 문장(없는 번호면 «그런 게시물은 없어요»)을, 응답조차 못 받았으면 피드와 같은 문장을 보여 준다.
     const message = error instanceof ApiError ? error.message : "게시물을 불러오지 못했습니다.";
     return <p className={stateStyles.errorText}>{message}</p>;
