@@ -1,5 +1,4 @@
 // ~/instagram-next/components/FeedItem.jsx
-import { useRouter } from "next/navigation";
 import styles from "./FeedItem.module.scss";
 import Carousel from "./Carousel.jsx";
 import FeedItemHeader from "./FeedItemHeader.jsx";
@@ -23,13 +22,10 @@ const FeedItem = ({
   commentCount,
   isFirst,
   viewerId,
+  onOpenDetail,
 }) => {
-  const router = useRouter();
   const { mutate, isPending } = useLikePost(viewerId);
   const toggleLike = () => mutate({ postId, liked: !liked });
-
-  // 말풍선 버튼과 «댓글 N개 보기» 는 게시물 하나의 주소로 간다.
-  const openDetail = () => router.push(`/p/${postId}`);
 
   // 사진을 두 번 누르는 것은 «누르기» 만 한다 — 이미 눌렀거나 보내는 중이면 보내지 않는다.
   const likeByDoubleClick = () => {
@@ -59,7 +55,7 @@ const FeedItem = ({
         liked={liked}
         isPending={isPending}
         onToggleLike={toggleLike}
-        onOpenDetail={openDetail}
+        onOpenDetail={onOpenDetail}
       />
 
       <div className={styles.content}>
@@ -71,7 +67,7 @@ const FeedItem = ({
       </div>
 
       <CommentArea>
-        <FeedItemComments commentCount={commentCount} onOpenDetail={openDetail} />
+        <FeedItemComments commentCount={commentCount} onOpenDetail={onOpenDetail} />
         <CommentForm postId={postId} />
       </CommentArea>
     </article>

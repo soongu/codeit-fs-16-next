@@ -28,6 +28,7 @@ const PostCard = ({ postId }) => {
     return <p className={stateStyles.errorText}>{message}</p>;
   }
 
+  // 이미 이 게시물의 주소다 — 상세로 가는 버튼에 할 일(onOpenDetail)을 넘기지 않는다.
   return (
     <div className={listStyles.feedList}>
       <FeedItem
