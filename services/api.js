@@ -74,6 +74,7 @@ export const authApi = {
 
 export const postApi = {
   getPage: (params) => request("/posts", { params }),
+  get: (id) => request(`/posts/${id}`),
   likePost: (id) => request(`/posts/${id}/likes/me`, { method: "PUT" }),
   unlikePost: (id) => request(`/posts/${id}/likes/me`, { method: "DELETE" }),
   create: (body) => request("/posts", { method: "POST", body }),
