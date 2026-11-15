@@ -25,6 +25,11 @@ export function proxy(request) {
     return;
   }
 
+  // 게시물 주소(/p/9)도 사용자 이름이 든 주소가 아니다 — 프로필 목록 확인을 건너뛴다.
+  if (pathname.startsWith("/p/")) {
+    return;
+  }
+
   const username = pathname.split("/")[1];
   const profile = profiles.find((item) => item.username === username);
 
@@ -34,5 +39,5 @@ export function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/", "/:username", "/:username/saved"],
+  matcher: ["/", "/:username", "/:username/saved", "/p/:id"],
 };
