@@ -1,6 +1,7 @@
 // ~/instagram-next/components/PostDetailModal.jsx
 "use client";
 
+import { useRouter } from "next/navigation";
 import { FaTimes } from "react-icons/fa";
 import styles from "./PostDetailModal.module.scss";
 import Carousel from "./Carousel.jsx";
@@ -14,12 +15,16 @@ import { useLikePost } from "@/hooks/useLikePost.js";
 
 // 피드 위에 띄우는 게시물 하나 — 데이터는 페이지(PostCard)와 같은 usePost 로 받는다.
 const PostDetailModal = ({ postId }) => {
+  const router = useRouter();
   const { data: me } = useMe();
   const { data: post } = usePost(postId);
   const { mutate, isPending } = useLikePost(me?.id);
 
   // 받기 전에는 아무것도 그리지 않는다.
   if (post === undefined) return null;
+
+  // ✕ 나 바깥을 누르면 한 칸 뒤로 간다 — 모달을 연 주소(피드)로 돌아가면서 모달이 닫힌다.
+  const closeModal = () => router.back();
 
   const toggleLike = () => mutate({ postId: post.id, liked: !post.liked });
 
@@ -31,8 +36,8 @@ const PostDetailModal = ({ postId }) => {
 
   return (
     <div className={styles.modalOverlay}>
-      <div className={styles.modalBackdrop}></div>
-      <button className={styles.closeButton}>
+      <div className={styles.modalBackdrop} onClick={closeModal}></div>
+      <button className={styles.closeButton} onClick={closeModal}>
         <FaTimes />
       </button>
 
