@@ -17,6 +17,10 @@ const nextConfig = {
         source: "/api/v2/uploads/:path*",
         destination: `${process.env.API_URL}/api/v2/uploads/:path*`,
       },
+      {
+        source: "/uploads/:path*",
+        destination: `${process.env.API_URL}/uploads/:path*`,
+      },
     ];
   },
   images: {
