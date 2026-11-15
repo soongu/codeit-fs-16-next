@@ -6,6 +6,7 @@ import { FaEllipsis } from "react-icons/fa6";
 const FeedItemHeader = ({
   username,
   profileImage = "https://picsum.photos/seed/default/40/40",
+  onOpenOptions,
 }) => {
   return (
     <header className={styles.header}>
@@ -24,7 +25,7 @@ const FeedItemHeader = ({
           <Link href={`/${username}`} className={styles.username}>{username}</Link>
         </div>
       </div>
-      <button className={styles.optionsButton}><FaEllipsis /></button>
+      <button className={styles.optionsButton} onClick={onOpenOptions}><FaEllipsis /></button>
     </header>
   );
 };

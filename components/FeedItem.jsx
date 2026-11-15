@@ -23,6 +23,7 @@ const FeedItem = ({
   isFirst,
   viewerId,
   onOpenDetail,
+  onOpenOptions,
 }) => {
   const { mutate, isPending } = useLikePost(viewerId);
   const toggleLike = () => mutate({ postId, liked: !liked });
@@ -39,6 +40,7 @@ const FeedItem = ({
         postId={postId}
         username={username}
         profileImage={profileImage}
+        onOpenOptions={onOpenOptions}
       />
 
       <div className={styles.imageContainer}>

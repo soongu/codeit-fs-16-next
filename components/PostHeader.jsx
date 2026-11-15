@@ -7,6 +7,7 @@ import styles from "./PostDetailModal.module.scss";
 const PostHeader = ({
   username,
   profileImage = "https://picsum.photos/seed/default/40/40",
+  onOpenOptions,
 }) => {
   const router = useRouter();
 
@@ -29,7 +30,7 @@ const PostHeader = ({
         </span>
       </div>
       <div className={styles.postHeaderRight}>
-        <button type="button" className={styles.postOptionsButton}>
+        <button type="button" className={styles.postOptionsButton} onClick={onOpenOptions}>
           <FaEllipsis />
         </button>
       </div>

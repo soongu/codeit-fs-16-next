@@ -1,10 +1,12 @@
 // ~/instagram-next/components/PostCard.jsx
 "use client";
 
+import { useState } from "react";
 import listStyles from "./FeedList.module.scss";
 import stateStyles from "./StatusMessage.module.scss";
 import FeedItem from "./FeedItem.jsx";
 import FeedSkeleton from "./FeedSkeleton.jsx";
+import PostOptions from "./PostOptions.jsx";
 import { usePost } from "@/hooks/usePost.js";
 import { useMe } from "@/hooks/useMe.js";
 import { ApiError } from "@/services/api.js";
@@ -13,6 +15,7 @@ import { ApiError } from "@/services/api.js";
 const PostCard = ({ postId }) => {
   const { data: me } = useMe();
   const { data: post, isPending, error } = usePost(postId);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   if (isPending) {
     return (
@@ -44,7 +47,10 @@ const PostCard = ({ postId }) => {
         commentCount={post.commentCount}
         isFirst
         viewerId={me.id}
+        onOpenOptions={() => setIsOptionsOpen(true)}
       />
+
+      {isOptionsOpen && <PostOptions post={post} onClose={() => setIsOptionsOpen(false)} />}
     </div>
   );
 };
