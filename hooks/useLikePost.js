@@ -10,7 +10,8 @@ function changeLike({ postId, liked }) {
 // 피드 목록 — 받아 둔 페이지들을 돌며 게시물 하나만 바꾼 새 데이터를 만든다.
 // change 는 그 게시물을 받아 바꿀 필드만 돌려주는 함수다.
 // 피드를 거치지 않고 상세 주소로 바로 들어왔으면 받아 둔 목록이 없다(undefined) — 그때는 바꾸지 않는다.
-function changePost(data, postId, change) {
+// 글 고치기(useUpdatePost)도 이 함수로 바꾼다.
+export function changePost(data, postId, change) {
   if (data === undefined) return data;
 
   return {
@@ -23,7 +24,7 @@ function changePost(data, postId, change) {
 }
 
 // 상세 화면 — 받아 둔 게시물 하나를 바꾼 새 객체를 만든다. 받아 둔 게시물이 없으면 바꾸지 않는다.
-function changeDetail(post, change) {
+export function changeDetail(post, change) {
   if (post === undefined) return post;
 
   return { ...post, ...change(post) };
