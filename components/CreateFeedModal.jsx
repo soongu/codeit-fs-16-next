@@ -7,7 +7,8 @@ import CreateFeedDiscard from "./CreateFeedDiscard.jsx";
 import CreateFeedHeader from "./CreateFeedHeader.jsx";
 import CreateFeedUpload from "./CreateFeedUpload.jsx";
 import CreateFeedWrite from "./CreateFeedWrite.jsx";
-import { postApi, uploadApi } from "@/services/api.js";
+import { postApi, uploadApi, ApiError } from "@/services/api.js";
+import { useUiStore } from "@/stores/useUiStore.js";
 
 const CreateFeedModal = ({ onClose }) => {
   const [step, setStep] = useState(1);
@@ -16,6 +17,7 @@ const CreateFeedModal = ({ onClose }) => {
   const [content, setContent] = useState("");
   const [isDiscardOpen, setIsDiscardOpen] = useState(false);
   const queryClient = useQueryClient();
+  const showToast = useUiStore((state) => state.showToast);
 
   // 사진을 고르면 파일마다 미리보기 주소를 만들고 단계 2 로 간다.
   const handleFilesSelected = (selected) => {
@@ -43,9 +45,10 @@ const CreateFeedModal = ({ onClose }) => {
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
       onClose();
     },
-    // 실패를 알리는 문장은 아직 없다 — Console 에만 남긴다.
+    // 실패하면 화면 위쪽 알림으로 알린다 — 모달은 그대로 두어 다시 누를 수 있다.
+    // 응답을 받았으면 request() 가 만든 문장(서버가 보낸 문장, 없으면 상태 코드 문장)을, 응답조차 못 받았으면 화면이 정한 문장을 보여 준다.
     onError: (error) => {
-      console.error(error);
+      showToast(error instanceof ApiError ? error.message : "게시물을 올리지 못했어요. 다시 시도해 주세요.", "error");
     },
   });
 
