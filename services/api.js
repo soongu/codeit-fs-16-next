@@ -79,6 +79,7 @@ export const postApi = {
   unlikePost: (id) => request(`/posts/${id}/likes/me`, { method: "DELETE" }),
   create: (body) => request("/posts", { method: "POST", body }),
   update: (id, body) => request(`/posts/${id}`, { method: "PATCH", body }),
+  remove: (id) => request(`/posts/${id}`, { method: "DELETE" }),
 };
 
 export const memberApi = {
