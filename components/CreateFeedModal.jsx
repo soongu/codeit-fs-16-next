@@ -29,7 +29,7 @@ const CreateFeedModal = ({ onClose }) => {
     };
   }, [previewUrls]);
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     // 사진을 먼저 올려 주소를 받고, 그 주소와 글로 게시물을 만든다.
     mutationFn: async () => {
       const { imageUrls } = await uploadApi.images(files);
@@ -51,16 +51,27 @@ const CreateFeedModal = ({ onClose }) => {
     mutate();
   };
 
+  // 올리는 동안에는 ✕ 나 바깥을 눌러도 닫지 않는다.
+  const handleClose = () => {
+    if (isPending) return;
+    onClose();
+  };
+
   return (
     <div className={styles.modalContainer}>
-      <div className={styles.modalBackdrop} onClick={onClose} />
+      <div className={styles.modalBackdrop} onClick={handleClose} />
 
-      <button className={styles.modalCloseButton} onClick={onClose} type="button">
+      <button className={styles.modalCloseButton} onClick={handleClose} type="button">
         <FaXmark />
       </button>
 
       <div className={styles.modalContent}>
-        <CreateFeedHeader step={step} onBack={() => setStep(1)} onShare={handleShare} />
+        <CreateFeedHeader
+          step={step}
+          isSharing={isPending}
+          onBack={() => setStep(1)}
+          onShare={handleShare}
+        />
 
         <div className={styles.modalBody}>
           <div className={`${styles.step} ${step === 1 ? styles.active : ""}`}>
