@@ -76,6 +76,7 @@ export const postApi = {
   getPage: (params) => request("/posts", { params }),
   likePost: (id) => request(`/posts/${id}/likes/me`, { method: "PUT" }),
   unlikePost: (id) => request(`/posts/${id}/likes/me`, { method: "DELETE" }),
+  create: (body) => request("/posts", { method: "POST", body }),
 };
 
 export const memberApi = {
