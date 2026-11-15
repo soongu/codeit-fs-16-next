@@ -8,7 +8,8 @@ import { useMe } from "@/hooks/useMe.js";
 const MAX_CONTENT_LENGTH = 2200;
 
 // 만들기 모달의 단계 2 — 왼쪽은 고른 사진들, 오른쪽은 글쓴이와 글 입력칸.
-const CreateFeedWrite = ({ previewUrls, content, onContentChange }) => {
+// 정보 수정 화면은 왼쪽에 게시물의 지금 사진을 보여 주므로 사진의 대체 텍스트(imageAlt)를 따로 받는다.
+const CreateFeedWrite = ({ previewUrls, content, onContentChange, imageAlt = "고른 사진 미리보기" }) => {
   const { data: me } = useMe();
 
   // 2,200자를 넘게 붙여 넣으면 넘친 만큼 잘라서 넘긴다.
@@ -20,7 +21,7 @@ const CreateFeedWrite = ({ previewUrls, content, onContentChange }) => {
     <div className={styles.writeContainer}>
       <div className={styles.writeLayout}>
         <div className={styles.previewArea}>
-          <Carousel imageUrls={previewUrls} alt="고른 사진 미리보기" />
+          <Carousel imageUrls={previewUrls} alt={imageAlt} />
         </div>
 
         <div className={styles.writeArea}>
