@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaXmark } from "react-icons/fa6";
 import styles from "./CreateFeedModal.module.scss";
+import CreateFeedDiscard from "./CreateFeedDiscard.jsx";
 import CreateFeedHeader from "./CreateFeedHeader.jsx";
 import CreateFeedUpload from "./CreateFeedUpload.jsx";
 import CreateFeedWrite from "./CreateFeedWrite.jsx";
@@ -13,6 +14,7 @@ const CreateFeedModal = ({ onClose }) => {
   const [files, setFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [content, setContent] = useState("");
+  const [isDiscardOpen, setIsDiscardOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // 사진을 고르면 파일마다 미리보기 주소를 만들고 단계 2 로 간다.
@@ -52,9 +54,15 @@ const CreateFeedModal = ({ onClose }) => {
   };
 
   // 올리는 동안에는 ✕ 나 바깥을 눌러도 닫지 않는다.
+  // 글쓰기 단계에서는 바로 닫지 않고, 고른 사진과 쓴 글을 버릴지 먼저 묻는다.
   const handleClose = () => {
     if (isPending) return;
-    onClose();
+
+    if (step === 2) {
+      setIsDiscardOpen(true);
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -89,6 +97,11 @@ const CreateFeedModal = ({ onClose }) => {
           </div>
         </div>
       </div>
+
+      {/* «삭제» 는 모달을 닫는다 — 모달이 화면에서 빠지면 고른 사진과 쓴 글도 함께 사라진다. «취소» 는 묻는 것만 닫는다. */}
+      {isDiscardOpen && (
+        <CreateFeedDiscard onConfirm={onClose} onCancel={() => setIsDiscardOpen(false)} />
+      )}
     </div>
   );
 };
