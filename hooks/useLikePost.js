@@ -9,7 +9,7 @@ function changeLike({ postId, liked }) {
 
 // 피드 목록 — 받아 둔 페이지들을 돌며 게시물 하나만 바꾼 새 데이터를 만든다.
 // change 는 그 게시물을 받아 바꿀 필드만 돌려주는 함수다.
-// 피드를 거치지 않고 상세 주소로 바로 들어왔으면 받아 둔 목록이 없다 — 그때는 그대로 돌려준다.
+// 피드를 거치지 않고 상세 주소로 바로 들어왔으면 받아 둔 목록이 없다(undefined) — 그때는 바꾸지 않는다.
 function changePost(data, postId, change) {
   if (data === undefined) return data;
 
@@ -22,7 +22,7 @@ function changePost(data, postId, change) {
   };
 }
 
-// 상세 화면 — 받아 둔 게시물 하나를 바꾼 새 객체를 만든다. 받아 둔 게시물이 없으면 그대로 돌려준다.
+// 상세 화면 — 받아 둔 게시물 하나를 바꾼 새 객체를 만든다. 받아 둔 게시물이 없으면 바꾸지 않는다.
 function changeDetail(post, change) {
   if (post === undefined) return post;
 
@@ -58,7 +58,7 @@ export function useLikePost(userId) {
       return { previousPosts, previousPost };
     },
     onSuccess: (result, variables) => {
-      // 서버가 돌려준 { liked, likeCount } 로 두 캐시의 그 게시물만 맞춘다.
+      // 서버가 보낸 { liked, likeCount } 로 두 캐시의 그 게시물만 맞춘다.
       changeBoth(variables.postId, () => result);
     },
     onError: async (error, variables, onMutateResult) => {
