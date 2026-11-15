@@ -1,14 +1,14 @@
 // ~/instagram-next/components/CreateFeedWrite.jsx
 import Image from "next/image";
 import styles from "./CreateFeedModal.module.scss";
-import carousel from "./Carousel.module.scss";
+import Carousel from "./Carousel.jsx";
 import { useMe } from "@/hooks/useMe.js";
 
 // 게시물 글은 2,200자까지 쓸 수 있다.
 const MAX_CONTENT_LENGTH = 2200;
 
-// 만들기 모달의 단계 2 — 왼쪽은 고른 사진, 오른쪽은 글쓴이와 글 입력칸.
-const CreateFeedWrite = ({ previewUrl, content, onContentChange }) => {
+// 만들기 모달의 단계 2 — 왼쪽은 고른 사진들, 오른쪽은 글쓴이와 글 입력칸.
+const CreateFeedWrite = ({ previewUrls, content, onContentChange }) => {
   const { data: me } = useMe();
 
   // 2,200자를 넘게 붙여 넣으면 넘친 만큼 잘라서 넘긴다.
@@ -20,14 +20,7 @@ const CreateFeedWrite = ({ previewUrl, content, onContentChange }) => {
     <div className={styles.writeContainer}>
       <div className={styles.writeLayout}>
         <div className={styles.previewArea}>
-          <div className={carousel.carouselSlide}>
-            <Image
-              src={previewUrl}
-              alt="고른 사진 미리보기"
-              width={600}
-              height={600}
-            />
-          </div>
+          <Carousel imageUrls={previewUrls} alt="고른 사진 미리보기" />
         </div>
 
         <div className={styles.writeArea}>

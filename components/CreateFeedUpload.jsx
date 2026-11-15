@@ -3,15 +3,16 @@ import { useRef } from "react";
 import { FaImages } from "react-icons/fa6";
 import styles from "./CreateFeedModal.module.scss";
 
-// 만들기 모달의 단계 1 — 사진을 고르면 그 파일을 모달에 넘긴다.
-const CreateFeedUpload = ({ onFileSelected }) => {
+// 만들기 모달의 단계 1 — 사진을 고르면 고른 파일들을 배열로 모달에 넘긴다.
+const CreateFeedUpload = ({ onFilesSelected }) => {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    // event.target.files 는 배열이 아니라 FileList 다 — 배열로 바꿔서 넘긴다.
+    const files = Array.from(event.target.files);
 
-    if (file) {
-      onFileSelected(file);
+    if (files.length > 0) {
+      onFilesSelected(files);
     }
 
     // 뒤로 와서 같은 사진을 다시 골라도 change 가 일어나게 비워 둔다.
@@ -26,6 +27,7 @@ const CreateFeedUpload = ({ onFileSelected }) => {
         <input
           type="file"
           ref={fileInputRef}
+          multiple
           accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
           style={{ display: "none" }}
           onChange={handleFileChange}
