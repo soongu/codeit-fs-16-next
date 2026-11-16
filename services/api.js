@@ -82,6 +82,10 @@ export const postApi = {
   remove: (id) => request(`/posts/${id}`, { method: "DELETE" }),
 };
 
+export const commentApi = {
+  getPage: (postId, params) => request(`/posts/${postId}/comments`, { params }),
+};
+
 export const memberApi = {
   search: (keyword) => request("/members/search", { params: { keyword } }),
 };
