@@ -67,6 +67,7 @@ const PostDetailModal = ({ postId }) => {
               onOpenOptions={() => setIsOptionsOpen(true)}
             />
             <PostComments
+              postId={post.id}
               username={post.username}
               profileImage={post.profileImage}
               content={post.content}
