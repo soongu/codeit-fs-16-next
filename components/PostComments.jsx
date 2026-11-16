@@ -17,7 +17,7 @@ const PostComments = ({
   createdAt,
 }) => {
   const router = useRouter();
-  const { data, isPending, error } = useComments(postId);
+  const { data, isPending, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useComments(postId);
 
   // 받은 페이지들의 댓글을 차례대로 이어 붙인다 — 피드가 게시물을 이어 붙이는 것과 같다.
   const comments = data?.pages.flatMap((page) => page.items) ?? [];
@@ -97,6 +97,18 @@ const PostComments = ({
               </div>
             </div>
           ))
+        )}
+
+        {/* 다음 페이지가 있으면 + 버튼 — 받는 동안은 눌러도 다시 보내지 않는다. */}
+        {hasNextPage && (
+          <div className={styles.loadMoreContainer}>
+            <button type="button" className={styles.loadMoreButton} onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+              <svg aria-label="댓글 더 보기" fill="currentColor" height="28" role="img" viewBox="0 0 24 24" width="28">
+                <circle cx="12" cy="12" fill="none" r="11" stroke="currentColor" strokeWidth="2"></circle>
+                <path d="M12 6v12M6 12h12" fill="none" stroke="currentColor" strokeWidth="2"></path>
+              </svg>
+            </button>
+          </div>
         )}
       </div>
     </div>
