@@ -57,6 +57,7 @@ export default function MoreButton() {
               // 이 메뉴도 숨겨진 채 남는다 — 닫고 나서 로그아웃한다.
               setIsOpen(false);
               logout();
+              
             }}>
             <span>로그아웃</span>
           </button>

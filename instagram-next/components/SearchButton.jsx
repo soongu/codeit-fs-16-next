@@ -6,7 +6,7 @@ import { useUiStore } from '@/stores/useUiStore.js';
 import styles from './Sidebar.module.scss';
 
 export default function SearchButton() {
-  console.log('[render] SearchButton');
+  // console.log('[render] SearchButton');
   const toggle = useUiStore((state) => state.toggleSearch);
 
   return (

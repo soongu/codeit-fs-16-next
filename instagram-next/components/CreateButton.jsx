@@ -7,7 +7,7 @@ import styles from './Sidebar.module.scss';
 
 export default function CreateButton() {
 
-  console.log('[render] CreateButton');
+  // console.log('[render] CreateButton');
 
   const open = useUiStore((state) => state.openCreateFeed);
 

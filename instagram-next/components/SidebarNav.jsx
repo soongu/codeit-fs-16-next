@@ -5,7 +5,7 @@ import { useUiStore } from '@/stores/useUiStore.js';
 import styles from './Sidebar.module.scss';
 
 export default function SidebarNav({ children }) {
-  console.log('[render] SidebarNav');
+  // console.log('[render] SidebarNav');
   const isSearchOpen = useUiStore((state) => state.isSearchOpen);
   const closeSearch = useUiStore((state) => state.closeSearch);
 

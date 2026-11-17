@@ -13,7 +13,7 @@ import MoreButton from './MoreButton.jsx';
 
 function Sidebar() {
 
-  console.log('[render] Sidebar');
+  // console.log('[render] Sidebar');
 
   return (
     <>

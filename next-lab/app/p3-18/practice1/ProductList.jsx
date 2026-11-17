@@ -11,7 +11,7 @@ const products = [
 
 export default function ProductList() {
   const addItem = useCartStore((state) => state.addItem);
-  console.log('[render] ProductList');
+  // console.log('[render] ProductList');
 
   return (
     <ul className='mt-4 space-y-2'>

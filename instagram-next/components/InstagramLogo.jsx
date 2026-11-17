@@ -1,6 +1,6 @@
 const InstagramLogo = () => {
 
-  console.log('[render] InstagramLogo');
+  // console.log('[render] InstagramLogo');
 
   return (
     <svg aria-label="Instagram" className="_ab6-" color="rgb(0, 0, 0)" fill="rgb(0, 0, 0)" height="29" role="img"

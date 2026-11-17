@@ -7,7 +7,7 @@ import carousel from './Carousel.module.scss';
 
 const CreateFeedModal = ({ onClose }) => {
 
-  console.log('[render] CreateFeedModal');
+  // console.log('[render] CreateFeedModal');
 
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileInputRef = useRef(null);
