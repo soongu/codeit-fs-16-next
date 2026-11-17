@@ -11,6 +11,13 @@ import { signupSchema, PHONE } from './signupSchema.js';
 import { useDuplicateCheck } from './useDuplicateCheck.js';
 import { authApi } from '@/services/api.js';
 
+// 가입이 실패했을 때 에러 코드마다 문장을 보여 줄 입력칸 — 입력칸의 name 속성과 같다.
+const FIELD = {
+  USERNAME_TAKEN: "username",
+  EMAIL_TAKEN: "emailOrPhone",
+  PHONE_TAKEN: "emailOrPhone",
+};
+
 
 // 입력칸 하나 — 칸마다 같은 마크업을 되풀이하지 않으려고 컴포넌트로 뗐다.
 function SignupField({ type, name, placeholder, value, onChange, error }) {
@@ -41,7 +48,6 @@ function SignupField({ type, name, placeholder, value, onChange, error }) {
 }
 
 export default function SignupForm() {
-
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -56,25 +62,27 @@ export default function SignupForm() {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm({ ...form, [name]: value });
+    // 다시 치기 시작하면 앞에서 가입이 실패한 문장을 지운다.
+    reset();
   };
 
-
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending, error, reset } = useMutation({
     mutationFn: authApi.signup,
-    // 가입이 끝나면 로그인 화면으로 간다.
+    // 가입이 끝나면 방금 가입한 사용자 이름을 주소에 실어 로그인 화면으로 간다.
     onSuccess: (data) =>
       router.push(`/login?${new URLSearchParams({ username: data.username })}`),
-    // 중복 확인을 통과한 뒤에 누가 먼저 가입했을 수 있다 — 칸마다 다시 묻게 한다.
-    onError: () =>
-      queryClient.invalidateQueries({ queryKey: ['check-duplicate'] }),
   });
+
+  // 가입이 실패하면 에러 코드로 문장을 보여 줄 칸을 고른다 — 표에 없는 코드면 버튼 위(form)에 보여 준다.
+  const failedField = error ? (FIELD[error.code] ?? 'form') : undefined;
+  const serverError = (name) =>
+    failedField === name ? error.message : undefined;
 
   const handleSubmit = (event) => {
     // 브라우저가 폼을 주소에 실어 보내는 기본 동작을 막고, 우리가 직접 보낸다.
     event.preventDefault();
     mutate(form);
   };
-
 
   // 그릴 때마다 지금 입력값을 규칙에 대 본다 — 결과를 State 로 따로 들고 있지 않는다.
   const result = signupSchema.safeParse(form);
@@ -112,7 +120,11 @@ export default function SignupForm() {
         placeholder='휴대폰 번호 또는 이메일 주소'
         value={form.emailOrPhone}
         onChange={handleChange}
-        error={errors.emailOrPhone?.[0] ?? takenMessage(contactCheck)}
+        error={
+          errors.emailOrPhone?.[0] ??
+          takenMessage(contactCheck) ??
+          serverError('emailOrPhone')
+        }
         checked={contactCheck !== undefined}
       />
       <SignupField
@@ -129,7 +141,11 @@ export default function SignupForm() {
         placeholder='사용자 이름'
         value={form.username}
         onChange={handleChange}
-        error={errors.username?.[0] ?? takenMessage(usernameCheck)}
+        error={
+          errors.username?.[0] ??
+          takenMessage(usernameCheck) ??
+          serverError('username')
+        }
         checked={usernameCheck !== undefined}
       />
       <SignupField
@@ -147,7 +163,7 @@ export default function SignupForm() {
         <a href='#'>더 알아보기</a>
       </p>
 
-      {error && <span className={styles.errorMessage}>{error.message}</span>}
+      {failedField === "form" && <span className={styles.errorMessage}>{error.message}</span>}
 
       <button
         type='submit'
