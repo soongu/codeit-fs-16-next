@@ -4,6 +4,9 @@ import { z } from 'zod';
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PHONE = /^010-?\d{4}-?\d{4}$/;
 
+// bcrypt 는 비밀번호의 앞 72바이트까지만 쓴다 — 서버와 같은 기준으로 UTF-8 바이트 수를 센다.
+const fitsBcrypt = (value) => new TextEncoder().encode(value).length <= 72;
+
 // 서버의 schemas/authSchema.js 와 같은 규칙이다 — 보내기 전에 화면에서 먼저 알려 주려고 한 벌 더 둔다.
 export const signupSchema = z.object({
   emailOrPhone: z
@@ -20,5 +23,11 @@ export const signupSchema = z.object({
     .regex(/^[a-zA-Z0-9._]+$/, {
       error: '사용자 이름은 영문, 숫자, 밑줄(_), 마침표(.)만 쓸 수 있어요',
     }),
-  password: z.string().min(8, { error: '비밀번호는 8자 이상이어야 해요' }),
+  password: z
+    .string()
+    .min(8, { error: '비밀번호는 8자 이상이어야 해요' })
+    .refine(fitsBcrypt, {
+      error:
+        '비밀번호가 너무 길어요. 영문은 72자, 한글은 24자까지 쓸 수 있어요',
+    }),
 });
