@@ -1,20 +1,19 @@
 // ~/instagram-next/components/FeedList.jsx
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import styles from './FeedList.module.scss';
 import stateStyles from './StatusMessage.module.scss';
 import FeedItem from './FeedItem.jsx';
 import FeedSkeleton from './FeedSkeleton.jsx';
-
 import { postApi } from '@/services/api.js';
 import { useMe } from '@/hooks/useMe.js';
 
 const PER_PAGE = 2;
 
-function getPostPage(userId, pageParam) {
-  const params = { userId, limit: PER_PAGE };
+function getPostPage(pageParam) {
+  const params = { limit: PER_PAGE };
 
   // 첫 페이지에는 커서가 없다 — null 을 그대로 넣으면 주소에 cursor=null 이라는 글자가 실린다.
   if (pageParam !== null) {
@@ -25,33 +24,24 @@ function getPostPage(userId, pageParam) {
 }
 
 const FeedList = () => {
-
   const { data: me } = useMe();
-
   const {
     data,
     isPending,
     error,
     fetchNextPage,
-    isFetchingNextPage,
     hasNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
+    // 누가 보느냐에 따라 liked 가 달라진다 — 서버는 로그인 정보로 정하고, 화면은 보는 사람의 번호를 키에 넣는다.
     queryKey: ['posts', me?.id],
-    queryFn: ({ pageParam }) => getPostPage(me.id, pageParam),
+    queryFn: ({ pageParam }) => getPostPage(pageParam),
     // 누가 보는지 알기 전에는 보내지 않는다.
     enabled: me !== undefined,
     initialPageParam: null,
+    // 서버가 준 커서를 그대로 돌려준다 — 끝이면 null 이 와서 다음 페이지가 없다.
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-
-    // 1. 탭 이동시 무분별한 재요청 차단
-    // staleTime: 10 * 60 * 1000, // 10분간 fresh 유지
-    // refetchOnWindowFocus: false, // 창 포커스 이동시 자동 refetch 비활성화
-
-    // maxPages: 5, // 아무리 많이 스크롤해도 메모리에는 5페이지까지만 저장해
   });
-
-  
-
   const loaderRef = useRef(null);
 
   useEffect(() => {
@@ -91,7 +81,6 @@ const FeedList = () => {
   }
 
   const posts = data.pages.flatMap((page) => page.items);
-  
 
   return (
     <>
@@ -117,7 +106,6 @@ const FeedList = () => {
           />
         ))}
       </div>
-
       <div
         ref={loaderRef}
         className={styles.loader}>
@@ -133,4 +121,3 @@ const FeedList = () => {
 };
 
 export default FeedList;
-1;
