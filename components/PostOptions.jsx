@@ -2,7 +2,7 @@
 import { useState } from "react";
 import styles from "./CreateFeedModal.module.scss";
 import PostEditModal from "./PostEditModal.jsx";
-import PostDeleteConfirm from "./PostDeleteConfirm.jsx";
+import DeleteConfirm from "./DeleteConfirm.jsx";
 import { ApiError } from "@/services/api.js";
 import { useMe } from "@/hooks/useMe.js";
 import { useDeletePost } from "@/hooks/useDeletePost.js";
@@ -37,7 +37,7 @@ const PostOptions = ({ post, onClose, onDeleted }) => {
 
   // «삭제» 를 누르면 메뉴 대신 정말 지울지 묻는다 — «취소» 를 누르면 함께 닫힌다.
   if (view === "delete") {
-    return <PostDeleteConfirm isDeleting={isPending} onConfirm={handleDelete} onCancel={onClose} />;
+    return <DeleteConfirm isDeleting={isPending} onConfirm={handleDelete} onCancel={onClose} />;
   }
 
   return (

@@ -9,18 +9,26 @@ import { useComments } from "@/hooks/useComments.js";
 const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
 
 // 맨 위에 게시물 글 한 줄, 그 아래에 댓글 목록을 그린다.
+// authorId 는 게시물을 쓴 사람이고 viewerId 는 지금 보는 사람이다. 둘을 보고 줄마다 «삭제» 를 보일지 정한다.
+// «삭제» 를 누르면 onDeleteComment 에 그 댓글을 넘긴다. 정말 지울지는 부르는 쪽이 묻는다.
 const PostComments = ({
   postId,
+  authorId,
+  viewerId,
   username,
   profileImage = DEFAULT_PROFILE_IMAGE,
   content,
   createdAt,
+  onDeleteComment,
 }) => {
   const router = useRouter();
   const { data, isPending, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useComments(postId);
 
   // 받은 페이지들의 댓글을 차례대로 이어 붙인다 — 피드가 게시물을 이어 붙이는 것과 같다.
   const comments = data?.pages.flatMap((page) => page.items) ?? [];
+
+  // 내 댓글이거나 내 게시물에 달린 댓글이면 지울 수 있다. 서버도 같은 규칙으로 확인한다.
+  const canDelete = (comment) => comment.authorId === viewerId || authorId === viewerId;
 
   // 사진이나 사용자 이름을 누르면 그 사람의 프로필로 간다.
   const handleUserClick = (name) => router.push(`/${name}`);
@@ -92,6 +100,11 @@ const PostComments = ({
                   <div className={styles.postTime}>{timeAgo(comment.createdAt)}</div>
                   {comment.likeCount > 0 && (
                     <div className={styles.commentLikes}>좋아요 {comment.likeCount.toLocaleString()}개</div>
+                  )}
+                  {canDelete(comment) && (
+                    <button type="button" className={styles.replyButton} onClick={() => onDeleteComment(comment)}>
+                      삭제
+                    </button>
                   )}
                 </div>
               </div>

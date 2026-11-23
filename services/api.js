@@ -85,6 +85,7 @@ export const postApi = {
 export const commentApi = {
   getPage: (postId, params) => request(`/posts/${postId}/comments`, { params }),
   create: (postId, content) => request(`/posts/${postId}/comments`, { method: "POST", body: { content } }),
+  remove: (postId, commentId) => request(`/posts/${postId}/comments/${commentId}`, { method: "DELETE" }),
 };
 
 export const memberApi = {
