@@ -2,13 +2,33 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { commentApi } from "@/services/api.js";
 
+// 받아 둔 댓글 목록의 마지막 페이지 끝에 새 댓글을 붙인 새 데이터를 만든다.
+// 새 댓글은 가장 늦게 단 것이라 오래된 순 목록의 맨 끝에 온다.
+// 마지막 페이지 뒤에 아직 받을 페이지가 남았으면(hasNext) 그대로 둔다. + 로 끝까지 받으면 그 페이지에 함께 온다.
+// 받아 둔 목록이 없으면(모달을 연 적이 없으면) 그대로 둔다.
+function appendComment(data, comment) {
+  if (data === undefined) return data;
+
+  const lastIndex = data.pages.length - 1;
+  if (data.pages[lastIndex].hasNext) return data;
+
+  return {
+    ...data,
+    pages: data.pages.map((page, index) =>
+      index === lastIndex ? { ...page, items: [...page.items, comment] } : page,
+    ),
+  };
+}
+
 // 게시물에 댓글을 단다. 누가 다는지는 서버가 로그인 정보로 정한다.
 export function useAddComment() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ postId, content }) => commentApi.create(postId, content),
-    // 달았으면 그 게시물의 댓글을 다시 받는다. 게시물을 올린 뒤 피드를 다시 받은 것과 같다.
-    onSuccess: (result, { postId }) => queryClient.invalidateQueries({ queryKey: ["comments", postId] }),
+    // 다시 받지 않고 서버가 돌려준 댓글을 받아 둔 목록에 붙인다.
+    onSuccess: ({ comment }, { postId }) => {
+      queryClient.setQueryData(["comments", postId], (data) => appendComment(data, comment));
+    },
   });
 }
