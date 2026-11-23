@@ -6,9 +6,10 @@ import { useAddComment } from "@/hooks/useAddComment.js";
 import { useUiStore } from "@/stores/useUiStore.js";
 
 // 피드 카드와 상세 모달이 함께 쓰는 댓글 입력창이다. 어느 게시물에 달지는 postId 로 받는다.
-const CommentForm = ({ postId }) => {
+// viewerId 는 지금 보는 사람이다. 댓글 수를 바꿀 캐시의 키를 맞추는 데 쓴다.
+const CommentForm = ({ postId, viewerId }) => {
   const [content, setContent] = useState("");
-  const { mutate, isPending } = useAddComment();
+  const { mutate, isPending } = useAddComment(viewerId);
   const showToast = useUiStore((state) => state.showToast);
 
   // 앞뒤 공백을 뗀 글이 비었거나 보내는 중이면 «게시» 를 누를 수 없다.

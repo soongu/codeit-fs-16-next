@@ -81,7 +81,7 @@ const PostDetailModal = ({ postId }) => {
             />
             {/* 댓글 입력창 */}
             <div className={styles.comment}>
-              <CommentForm postId={post.id} />
+              <CommentForm postId={post.id} viewerId={me?.id} />
             </div>
           </div>
         </div>

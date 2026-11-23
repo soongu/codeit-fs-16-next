@@ -70,7 +70,7 @@ const FeedItem = ({
 
       <CommentArea>
         <FeedItemComments commentCount={commentCount} onOpenDetail={onOpenDetail} />
-        <CommentForm postId={postId} />
+        <CommentForm postId={postId} viewerId={viewerId} />
       </CommentArea>
     </article>
   );
