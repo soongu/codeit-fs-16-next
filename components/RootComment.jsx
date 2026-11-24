@@ -109,6 +109,11 @@ const RootComment = ({
                 >
                   답글 달기
                 </button>
+                {canDelete(reply) && (
+                  <button type="button" className={styles.replyButton} onClick={() => onDeleteComment(reply)}>
+                    삭제
+                  </button>
+                )}
               </div>
             </div>
           </div>
