@@ -14,10 +14,22 @@ export const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
 const RootComment = ({ postId, comment, canDelete, onDeleteComment, onUserClick }) => {
   // «답글 보기» 를 누르기 전에는 답글을 받지 않는다.
   const [isOpen, setIsOpen] = useState(false);
-  const { data } = useReplies(postId, comment.id, isOpen);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useReplies(postId, comment.id, isOpen);
 
   // 받은 페이지들의 답글을 차례대로 이어 붙인다. 원댓글 목록과 같다.
   const replies = data?.pages.flatMap((page) => page.items) ?? [];
+
+  // 아직 받지 않은 답글 수다. 원댓글 줄의 replyCount 에서 받은 만큼 뺀다.
+  const remaining = comment.replyCount - replies.length;
+
+  // 첫 페이지를 받는 중이거나 다음 페이지를 받는 중이다.
+  const isFetchingReplies = isLoading || isFetchingNextPage;
+
+  // 펼치기 전이거나 다음 페이지가 남았으면 더 받을 수 있다. 첫 페이지를 받지 못했을 때도 다시 누를 수 있게 둔다.
+  const canFetchMore = !isOpen || data === undefined || hasNextPage;
+
+  // 처음 누르면 펼치기만 한다. 펼치면 useReplies 가 첫 페이지를 받는다. 그다음부터는 다음 페이지를 받는다.
+  const showMoreReplies = () => (isOpen ? fetchNextPage() : setIsOpen(true));
 
   return (
     <div className={styles.commentItem}>
@@ -75,13 +87,17 @@ const RootComment = ({ postId, comment, canDelete, onDeleteComment, onUserClick 
           </div>
         ))}
 
-        {/* 답글이 있고 아직 펼치지 않았으면 «답글 보기» 를 보인다. 누르면 그때 첫 페이지를 받는다. */}
-        {comment.replyCount > 0 && !isOpen && (
+        {/* 남은 답글이 있으면 «답글 보기(남은 수)» 를 보인다. 받는 동안은 버튼 대신 스피너다. 다 받으면 사라진다. */}
+        {remaining > 0 && (isFetchingReplies || canFetchMore) && (
           <div className={styles.viewRepliesContainer}>
             <div className={styles.replyLine} />
-            <button className={styles.viewRepliesButton} onClick={() => setIsOpen(true)}>
-              답글 보기({comment.replyCount}개)
-            </button>
+            {isFetchingReplies ? (
+              <div className={styles.replySpinner} />
+            ) : (
+              <button className={styles.viewRepliesButton} onClick={showMoreReplies}>
+                답글 보기({remaining}개)
+              </button>
+            )}
           </div>
         )}
       </div>
