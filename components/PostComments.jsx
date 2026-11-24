@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./PostDetailModal.module.scss";
 import { timeAgo } from "../utils/timeAgo.js";
+import HashtagText from "./HashtagText.jsx";
 import { useComments } from "@/hooks/useComments.js";
 import RootComment, { DEFAULT_PROFILE_IMAGE } from "./RootComment.jsx";
 
@@ -54,7 +55,9 @@ const PostComments = ({
             <span className={styles.postUsername} onClick={() => handleUserClick(username)}>
               {username}
             </span>
-            <span className={styles.postCaption}>{content}</span>
+            <span className={styles.postCaption}>
+              <HashtagText text={content} />
+            </span>
           </div>
           <div className={styles.postTime}>{timeAgo(createdAt)}</div>
         </div>
