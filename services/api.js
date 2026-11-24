@@ -85,7 +85,8 @@ export const postApi = {
 export const commentApi = {
   getPage: (postId, params) => request(`/posts/${postId}/comments`, { params }),
   getReplies: (postId, commentId, params) => request(`/posts/${postId}/comments/${commentId}/replies`, { params }),
-  create: (postId, content) => request(`/posts/${postId}/comments`, { method: "POST", body: { content } }),
+  // parentId 를 주면 그 원댓글에 다는 답글이다. 원댓글을 달 때는 parentId 가 undefined 라 JSON 에 실리지 않는다.
+  create: (postId, content, parentId) => request(`/posts/${postId}/comments`, { method: "POST", body: { content, parentId } }),
   remove: (postId, commentId) => request(`/posts/${postId}/comments/${commentId}`, { method: "DELETE" }),
 };
 

@@ -1,4 +1,5 @@
 // ~/instagram-next/components/PostComments.jsx
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./PostDetailModal.module.scss";
@@ -20,6 +21,8 @@ const PostComments = ({
   onDeleteComment,
 }) => {
   const router = useRouter();
+  // 답글 입력창을 연 원댓글의 번호와 입력창에 채울 이름이다. 입력창은 한 번에 하나만 연다.
+  const [replyTo, setReplyTo] = useState(null);
   const { data, isPending, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useComments(postId);
 
   // 받은 페이지들의 댓글을 차례대로 이어 붙인다 — 피드가 게시물을 이어 붙이는 것과 같다.
@@ -27,6 +30,9 @@ const PostComments = ({
 
   // 내 댓글이거나 내 게시물에 달린 댓글이면 지울 수 있다. 서버도 같은 규칙으로 확인한다.
   const canDelete = (comment) => comment.authorId === viewerId || authorId === viewerId;
+
+  // «답글 달기» 를 누르면 그 원댓글 아래에 입력창을 연다. target 은 누른 줄의 댓글이고 rootId 는 그 줄이 속한 원댓글이다.
+  const startReply = (target, rootId) => setReplyTo({ rootId, username: target.username });
 
   // 사진이나 사용자 이름을 누르면 그 사람의 프로필로 간다.
   const handleUserClick = (name) => router.push(`/${name}`);
@@ -81,9 +87,13 @@ const PostComments = ({
             <RootComment
               key={comment.id}
               postId={postId}
+              viewerId={viewerId}
               comment={comment}
+              replyUsername={replyTo?.rootId === comment.id ? replyTo.username : null}
               canDelete={canDelete}
               onDeleteComment={onDeleteComment}
+              onStartReply={startReply}
+              onReplied={() => setReplyTo(null)}
               onUserClick={handleUserClick}
             />
           ))

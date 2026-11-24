@@ -27,7 +27,8 @@ export function useAddComment(userId) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ postId, content }) => commentApi.create(postId, content),
+    // parentId 가 있으면 답글이다. 답글을 다는 입력창이 원댓글 번호를 넣어 보낸다.
+    mutationFn: ({ postId, content, parentId }) => commentApi.create(postId, content, parentId),
     // 다시 받지 않고 서버가 돌려준 댓글을 받아 둔 목록에 붙인다.
     // 댓글 수는 서버가 센 commentCount 로 피드 목록과 상세 화면 두 캐시의 그 게시물을 함께 바꾼다.
     onSuccess: ({ comment, commentCount }, { postId }) => {

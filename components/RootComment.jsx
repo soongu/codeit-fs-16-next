@@ -4,6 +4,7 @@ import Image from "next/image";
 import styles from "./PostDetailModal.module.scss";
 import { timeAgo } from "../utils/timeAgo.js";
 import { useReplies } from "@/hooks/useReplies.js";
+import ReplyForm from "./ReplyForm.jsx";
 
 // 프로필 사진이 없는 사람에게 보여 줄 사진이다. 게시물 글 줄 · 원댓글 줄 · 답글 줄이 함께 쓴다.
 export const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
@@ -11,7 +12,18 @@ export const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
 // 원댓글 한 줄과 그 아래의 답글을 그린다.
 // 답글을 펼쳤는지와 받은 답글은 원댓글마다 따로 있어서 원댓글 하나에 이 컴포넌트 하나를 둔다.
 // Hook 은 컴포넌트 맨 위에서만 부를 수 있다. 댓글 목록의 map 안에서는 useReplies 를 부를 수 없다.
-const RootComment = ({ postId, comment, canDelete, onDeleteComment, onUserClick }) => {
+// replyUsername 은 이 원댓글 아래에 연 답글 입력창의 «@이름» 이다. 입력창을 열지 않았으면 null 이다.
+const RootComment = ({
+  postId,
+  viewerId,
+  comment,
+  replyUsername,
+  canDelete,
+  onDeleteComment,
+  onStartReply,
+  onReplied,
+  onUserClick,
+}) => {
   // «답글 보기» 를 누르기 전에는 답글을 받지 않는다.
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useReplies(postId, comment.id, isOpen);
@@ -53,6 +65,13 @@ const RootComment = ({ postId, comment, canDelete, onDeleteComment, onUserClick 
           {comment.likeCount > 0 && (
             <div className={styles.commentLikes}>좋아요 {comment.likeCount.toLocaleString()}개</div>
           )}
+          <button
+            type="button"
+            className={styles.replyButton}
+            onClick={() => onStartReply(comment, comment.id)}
+          >
+            답글 달기
+          </button>
           {canDelete(comment) && (
             <button type="button" className={styles.replyButton} onClick={() => onDeleteComment(comment)}>
               삭제
@@ -82,6 +101,14 @@ const RootComment = ({ postId, comment, canDelete, onDeleteComment, onUserClick 
                 {reply.likeCount > 0 && (
                   <div className={styles.commentLikes}>좋아요 {reply.likeCount.toLocaleString()}개</div>
                 )}
+                {/* 답글에 다는 답글도 이 원댓글에 단다. 입력창만 그 답글을 쓴 사람의 이름으로 채운다. */}
+                <button
+                  type="button"
+                  className={styles.replyButton}
+                  onClick={() => onStartReply(reply, comment.id)}
+                >
+                  답글 달기
+                </button>
               </div>
             </div>
           </div>
@@ -99,6 +126,19 @@ const RootComment = ({ postId, comment, canDelete, onDeleteComment, onUserClick 
               </button>
             )}
           </div>
+        )}
+
+        {/* 이 원댓글에 답글 입력창을 열었으면 그린다. 누른 줄의 이름이 바뀌면 key 가 바뀌어 입력창을 새로 채운다. */}
+        {replyUsername !== null && (
+          <ReplyForm
+            key={replyUsername}
+            postId={postId}
+            rootId={comment.id}
+            rootUsername={comment.username}
+            targetUsername={replyUsername}
+            viewerId={viewerId}
+            onReplied={onReplied}
+          />
         )}
       </div>
     </div>
