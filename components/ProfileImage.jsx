@@ -7,7 +7,8 @@ const ProfileImage = ({ imageUrl, username }) => {
     <div className={styles.profileImageContainer}>
       <div className={styles.profileImage}>
         <Image
-          src={imageUrl}
+          // 프로필 사진이 없는 사람은 기본 이미지를 보여 준다.
+          src={imageUrl ?? "/default-profile.svg"}
           alt={`${username}의 프로필`}
           width={150}
           height={150}

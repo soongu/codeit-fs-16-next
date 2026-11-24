@@ -72,6 +72,10 @@ export const authApi = {
   unlinkSocialAccount: (provider) => request(`/auth/social-accounts/${provider}`, { method: "DELETE" }),
 };
 
+export const profileApi = {
+  get: (username) => request(`/profiles/${encodeURIComponent(username)}`),
+};
+
 export const hashtagApi = {
   getPosts: (name, params) => request(`/hashtags/${encodeURIComponent(name)}/posts`, { params }),
 };
