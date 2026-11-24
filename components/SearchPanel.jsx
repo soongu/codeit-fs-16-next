@@ -52,7 +52,8 @@ export default function SearchPanel() {
         onClick={() => goToProfile(member.username)}
       >
         <div className={styles.resultAvatar}>
-          <Image src={member.profileImage} alt={member.username} width={44} height={44} />
+          {/* 프로필 사진이 없는 사람은 기본 이미지를 보여 준다. */}
+          <Image src={member.profileImage ?? "/default-profile.svg"} alt={member.username} width={44} height={44} />
         </div>
         <div className={styles.resultInfo}>
           <span className={styles.resultUsername}>{member.username}</span>

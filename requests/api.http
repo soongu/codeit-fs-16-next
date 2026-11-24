@@ -1,14 +1,17 @@
 ### 민지의 프로필 화면
 GET http://localhost:3001/minji
 
-### 민지의 프로필
-GET http://localhost:3001/api/profiles/minji
-
-### 없는 사람의 프로필
-GET http://localhost:3001/api/profiles/kimchi
-
 ### 없는 주소
 GET http://localhost:3001/api/comments
+
+### jaehoon으로 로그인 - 사람 찾기는 이제 백엔드가 답해서 로그인 쿠키가 필요하다
+POST http://localhost:3001/api/v2/auth/login
+Content-Type: application/json
+
+{
+  "username": "jaehoon",
+  "password": "jaehoon1234"
+}
 
 ### 이름에 mi가 든 사람
 GET http://localhost:3001/api/v2/members/search?keyword=mi
