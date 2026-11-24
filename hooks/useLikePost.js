@@ -61,11 +61,13 @@ export function useLikePost(userId) {
     onSuccess: (result, variables) => {
       // 서버가 보낸 { liked, likeCount } 로 두 캐시의 그 게시물만 맞춘다.
       changeBoth(variables.postId, () => result);
-      // 해시태그 페이지의 그리드에도 같은 게시물이 있을 수 있다 - 키가 ["hashtagPosts"] 로 시작하는 캐시를 모두 맞춘다.
+      // 해시태그 페이지와 프로필의 그리드에도 같은 게시물이 있을 수 있다 - 두 키로 시작하는 캐시를 모두 맞춘다.
       // 그리드 칸에는 liked 가 없다 - 좋아요 수만 바꾼다.
-      queryClient.setQueriesData({ queryKey: ["hashtagPosts"] }, (data) =>
-        changePost(data, variables.postId, () => ({ likeCount: result.likeCount })),
-      );
+      for (const gridKey of [["hashtagPosts"], ["profilePosts"]]) {
+        queryClient.setQueriesData({ queryKey: gridKey }, (data) =>
+          changePost(data, variables.postId, () => ({ likeCount: result.likeCount })),
+        );
+      }
     },
     onError: async (error, variables, onMutateResult) => {
       // 받아 두지 않았던 캐시는 undefined 라 setQueryData 가 아무것도 하지 않는다.

@@ -74,6 +74,7 @@ export const authApi = {
 
 export const profileApi = {
   get: (username) => request(`/profiles/${encodeURIComponent(username)}`),
+  getPosts: (username, params) => request(`/profiles/${encodeURIComponent(username)}/posts`, { params }),
 };
 
 export const hashtagApi = {

@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import styles from "@/components/ProfilePage.module.scss";
 import ProfileHeader from "@/components/ProfileHeader.jsx";
+import ProfilePosts from "@/components/ProfilePosts.jsx";
 
 export const instant = false;
 
@@ -15,7 +16,13 @@ export async function generateMetadata({ params }) {
 async function ProfileContent({ params }) {
   const { username } = await params;
 
-  return <ProfileHeader username={username} />;
+  // 헤더와 그리드는 서로를 기다리지 않고 함께 받는다.
+  return (
+    <>
+      <ProfileHeader username={username} />
+      <ProfilePosts username={username} />
+    </>
+  );
 }
 
 // 주소의 사용자 이름을 읽는 부분은 Suspense 안에 둔다 - 상세 페이지가 주소의 번호를 읽을 때와 같다.
