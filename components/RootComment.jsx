@@ -109,8 +109,9 @@ const RootComment = ({
                 >
                   답글 달기
                 </button>
+                {/* 답글을 지울 때는 어느 원댓글의 답글인지(parentId)를 함께 넘긴다. 지운 뒤 고칠 캐시가 원댓글과 다르다. */}
                 {canDelete(reply) && (
-                  <button type="button" className={styles.replyButton} onClick={() => onDeleteComment(reply)}>
+                  <button type="button" className={styles.replyButton} onClick={() => onDeleteComment({ ...reply, parentId: comment.id })}>
                     삭제
                   </button>
                 )}

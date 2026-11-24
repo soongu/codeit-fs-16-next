@@ -45,7 +45,7 @@ const PostDetailModal = ({ postId }) => {
   // 지우기 확인에서 «삭제» 를 누르면 부른다. 지웠으면 확인을 닫는다. 실패하면 알림을 띄우고 확인은 그대로 둔다.
   const handleDeleteComment = () => {
     deleteComment(
-      { postId: post.id, commentId: commentToDelete.id },
+      { postId: post.id, commentId: commentToDelete.id, parentId: commentToDelete.parentId },
       {
         onSuccess: () => setCommentToDelete(null),
         onError: (error) => {
