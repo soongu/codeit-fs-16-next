@@ -5,6 +5,20 @@ import { retryOnServerError } from "@/hooks/useMe.js";
 
 const PER_PAGE = 20;
 
+// 받아 둔 댓글 페이지들에서 그 댓글 하나를 바꾼 새 데이터를 만든다. 받아 둔 목록이 없으면 그대로 둔다.
+// 피드의 changePost 와 같은 꼴이다. 답글을 달거나 지울 때 원댓글 줄의 replyCount 를 바꾸는 데 쓴다.
+export function changeComment(data, commentId, change) {
+  if (data === undefined) return data;
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      items: page.items.map((comment) => (comment.id === commentId ? { ...comment, ...change(comment) } : comment)),
+    })),
+  };
+}
+
 function getCommentPage(postId, pageParam) {
   const params = { limit: PER_PAGE };
 
