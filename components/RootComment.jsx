@@ -5,6 +5,7 @@ import styles from "./PostDetailModal.module.scss";
 import { timeAgo } from "../utils/timeAgo.js";
 import { useReplies } from "@/hooks/useReplies.js";
 import ReplyForm from "./ReplyForm.jsx";
+import MentionText from "./MentionText.jsx";
 
 // 프로필 사진이 없는 사람에게 보여 줄 사진이다. 게시물 글 줄 · 원댓글 줄 · 답글 줄이 함께 쓴다.
 export const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
@@ -58,7 +59,7 @@ const RootComment = ({
           <span className={styles.postUsername} onClick={() => onUserClick(comment.username)}>
             {comment.username}
           </span>
-          <span className={styles.postCaption}>{comment.content}</span>
+          <span className={styles.postCaption}><MentionText text={comment.content} /></span>
         </div>
         <div className={styles.commentTimeAndReply}>
           <div className={styles.postTime}>{timeAgo(comment.createdAt)}</div>
@@ -94,7 +95,7 @@ const RootComment = ({
                 <span className={styles.postUsername} onClick={() => onUserClick(reply.username)}>
                   {reply.username}
                 </span>
-                <span className={styles.postCaption}>{reply.content}</span>
+                <span className={styles.postCaption}><MentionText text={reply.content} /></span>
               </div>
               <div className={styles.commentTimeAndReply}>
                 <div className={styles.postTime}>{timeAgo(reply.createdAt)}</div>
