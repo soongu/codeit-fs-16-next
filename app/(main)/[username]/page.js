@@ -2,13 +2,8 @@
 import { Suspense } from "react";
 import styles from "@/components/ProfilePage.module.scss";
 import ProfileHeader from "@/components/ProfileHeader.jsx";
-import { profiles } from "@/data/profiles.js";
 
 export const instant = false;
-
-export function generateStaticParams() {
-  return profiles.map((profile) => ({ username: profile.username }));
-}
 
 // 탭 제목에는 주소의 사용자 이름만 싣는다 - 이름과 숫자는 화면이 서버에서 받는다.
 export async function generateMetadata({ params }) {
