@@ -4,9 +4,7 @@ import { useRouter } from "next/navigation";
 import styles from "./PostDetailModal.module.scss";
 import { timeAgo } from "../utils/timeAgo.js";
 import { useComments } from "@/hooks/useComments.js";
-
-// 프로필 사진이 없는 사람에게 보여 줄 사진 — 게시물 글 줄과 댓글 줄이 함께 쓴다.
-const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
+import RootComment, { DEFAULT_PROFILE_IMAGE } from "./RootComment.jsx";
 
 // 맨 위에 게시물 글 한 줄, 그 아래에 댓글 목록을 그린다.
 // authorId 는 게시물을 쓴 사람이고 viewerId 는 지금 보는 사람이다. 둘을 보고 줄마다 «삭제» 를 보일지 정한다.
@@ -80,35 +78,14 @@ const PostComments = ({
           </div>
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} className={styles.commentItem}>
-              <div className={styles.postProfileImage} onClick={() => handleUserClick(comment.username)} style={{ cursor: "pointer" }}>
-                <Image
-                  src={comment.profileImage ?? DEFAULT_PROFILE_IMAGE}
-                  alt="Profile"
-                  width={36}
-                  height={36}
-                />
-              </div>
-              <div className={styles.commentContent}>
-                <div>
-                  <span className={styles.postUsername} onClick={() => handleUserClick(comment.username)}>
-                    {comment.username}
-                  </span>
-                  <span className={styles.postCaption}>{comment.content}</span>
-                </div>
-                <div className={styles.commentTimeAndReply}>
-                  <div className={styles.postTime}>{timeAgo(comment.createdAt)}</div>
-                  {comment.likeCount > 0 && (
-                    <div className={styles.commentLikes}>좋아요 {comment.likeCount.toLocaleString()}개</div>
-                  )}
-                  {canDelete(comment) && (
-                    <button type="button" className={styles.replyButton} onClick={() => onDeleteComment(comment)}>
-                      삭제
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+            <RootComment
+              key={comment.id}
+              postId={postId}
+              comment={comment}
+              canDelete={canDelete}
+              onDeleteComment={onDeleteComment}
+              onUserClick={handleUserClick}
+            />
           ))
         )}
 
