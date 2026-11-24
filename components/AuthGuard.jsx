@@ -15,7 +15,7 @@ export default function AuthGuard() {
 
   useEffect(() => {
     if (needsLogin) {
-      router.replace(`/login?${new URLSearchParams({ next: pathname })}`);
+      router.replace(`/login?${new URLSearchParams({ next: pathname + window.location.search })}`);
     }
   }, [needsLogin, router, pathname]);
 
