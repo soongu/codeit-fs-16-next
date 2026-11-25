@@ -75,6 +75,9 @@ export const authApi = {
 export const profileApi = {
   get: (username) => request(`/profiles/${encodeURIComponent(username)}`),
   getPosts: (username, params) => request(`/profiles/${encodeURIComponent(username)}/posts`, { params }),
+  // 이 사람을 팔로우한다 · 팔로우를 그만둔다 - 누가 하는지는 서버가 로그인 정보로 정한다.
+  follow: (username) => request(`/profiles/${encodeURIComponent(username)}/followers/me`, { method: "PUT" }),
+  unfollow: (username) => request(`/profiles/${encodeURIComponent(username)}/followers/me`, { method: "DELETE" }),
 };
 
 export const hashtagApi = {
