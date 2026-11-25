@@ -101,6 +101,8 @@ export const commentApi = {
 
 export const memberApi = {
   search: (keyword) => request("/members/search", { params: { keyword } }),
+  // 올려 둔 사진의 주소를 내 프로필 사진으로 적는다.
+  updateProfileImage: (imageUrl) => request("/members/me/profile-image", { method: "PUT", body: { imageUrl } }),
 };
 
 export const uploadApi = {
