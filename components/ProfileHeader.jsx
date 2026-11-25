@@ -5,10 +5,13 @@ import styles from "./ProfilePage.module.scss";
 import status from "./StatusMessage.module.scss";
 import ProfileImage from "./ProfileImage.jsx";
 import { useProfile } from "@/hooks/useProfile.js";
+import { useMe } from "@/hooks/useMe.js";
 
 // 프로필 헤더 - 사진 · 사용자 이름 · 게시물 수 · 이름을 서버에서 받아 그린다.
 const ProfileHeader = ({ username }) => {
   const { data: profile, isPending, error } = useProfile(username);
+  // 지금 로그인한 사람 - 사이드바가 이미 받아 둔 «나는 누구» 다.
+  const { data: me } = useMe();
 
   if (isPending) {
     return <p className={status.loadingText}>로딩 중...</p>;
@@ -25,7 +28,8 @@ const ProfileHeader = ({ username }) => {
 
   return (
     <header className={styles.profileHeader}>
-      <ProfileImage imageUrl={profile.profileImage} username={profile.username} />
+      {/* 내 프로필일 때만 사진을 눌러 바꿀 수 있다. */}
+      <ProfileImage imageUrl={profile.profileImage} username={profile.username} editable={me?.username === profile.username} />
 
       <div className={styles.profileInfo}>
         <div className={styles.profileActions}>
