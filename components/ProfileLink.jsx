@@ -5,6 +5,7 @@ import Image from "next/image";
 import NavLink from "./NavLink.jsx";
 import styles from "./Sidebar.module.scss";
 import { useMe } from "@/hooks/useMe.js";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // 사이드바의 «프로필» — 로그인한 사람의 프로필로 간다.
 export default function ProfileLink() {
@@ -15,7 +16,7 @@ export default function ProfileLink() {
       <div className={styles.profileImage}>
         <Image
           // 프로필 사진이 없는 사람은 기본 이미지를 보여 준다.
-          src={me?.profileImage ?? "/default-profile.svg"}
+          src={me?.profileImage ?? DEFAULT_PROFILE_IMAGE}
           alt="프로필"
           width={40}
           height={40}

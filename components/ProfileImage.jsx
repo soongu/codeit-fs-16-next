@@ -5,6 +5,7 @@ import styles from "./ProfileImage.module.scss";
 import { ApiError } from "@/services/api.js";
 import { useUpdateProfileImage } from "@/hooks/useUpdateProfileImage.js";
 import { useUiStore } from "@/stores/useUiStore.js";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // editable 이면(내 프로필이면) 사진을 눌러 새 사진을 고를 수 있다.
 const ProfileImage = ({ imageUrl, username, editable }) => {
@@ -38,7 +39,7 @@ const ProfileImage = ({ imageUrl, username, editable }) => {
       <div className={`${styles.profileImage} ${editable ? styles.editable : ""}`} onClick={handleImageClick}>
         <Image
           // 프로필 사진이 없는 사람은 기본 이미지를 보여 준다.
-          src={imageUrl ?? "/default-profile.svg"}
+          src={imageUrl ?? DEFAULT_PROFILE_IMAGE}
           alt={`${username}의 프로필`}
           width={150}
           height={150}

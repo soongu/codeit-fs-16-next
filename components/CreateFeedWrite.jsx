@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "./CreateFeedModal.module.scss";
 import Carousel from "./Carousel.jsx";
 import { useMe } from "@/hooks/useMe.js";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // 게시물 글은 2,200자까지 쓸 수 있다.
 const MAX_CONTENT_LENGTH = 2200;
@@ -29,7 +30,7 @@ const CreateFeedWrite = ({ previewUrls, content, onContentChange, imageAlt = "�
             <div className={styles.profileImage}>
               <Image
                 // 프로필 사진이 없는 사람은 기본 이미지를 보여 준다.
-                src={me?.profileImage ?? "/default-profile.svg"}
+                src={me?.profileImage ?? DEFAULT_PROFILE_IMAGE}
                 alt="프로필"
                 width={28}
                 height={28}

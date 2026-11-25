@@ -6,9 +6,7 @@ import { timeAgo } from "../utils/timeAgo.js";
 import { useReplies } from "@/hooks/useReplies.js";
 import ReplyForm from "./ReplyForm.jsx";
 import MentionText from "./MentionText.jsx";
-
-// 프로필 사진이 없는 사람에게 보여 줄 사진이다. 게시물 글 줄 · 원댓글 줄 · 답글 줄이 함께 쓴다.
-export const DEFAULT_PROFILE_IMAGE = "https://picsum.photos/seed/default/40/40";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // 원댓글 한 줄과 그 아래의 답글을 그린다.
 // 답글을 펼쳤는지와 받은 답글은 원댓글마다 따로 있어서 원댓글 하나에 이 컴포넌트 하나를 둔다.

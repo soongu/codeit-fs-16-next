@@ -6,7 +6,8 @@ import styles from "./PostDetailModal.module.scss";
 import { timeAgo } from "../utils/timeAgo.js";
 import HashtagText from "./HashtagText.jsx";
 import { useComments } from "@/hooks/useComments.js";
-import RootComment, { DEFAULT_PROFILE_IMAGE } from "./RootComment.jsx";
+import RootComment from "./RootComment.jsx";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // 맨 위에 게시물 글 한 줄, 그 아래에 댓글 목록을 그린다.
 // authorId 는 게시물을 쓴 사람이고 viewerId 는 지금 보는 사람이다. 둘을 보고 줄마다 «삭제» 를 보일지 정한다.
@@ -16,7 +17,7 @@ const PostComments = ({
   authorId,
   viewerId,
   username,
-  profileImage = DEFAULT_PROFILE_IMAGE,
+  profileImage,
   content,
   createdAt,
   onDeleteComment,
@@ -44,7 +45,8 @@ const PostComments = ({
       <div className={styles.commentItem}>
         <div className={styles.postProfileImage} onClick={() => handleUserClick(username)} style={{ cursor: "pointer" }}>
           <Image
-            src={profileImage}
+            // 사진이 없는 사람은 profileImage 가 null 로 온다 - 매개변수 기본값은 undefined 일 때만 쓰인다.
+            src={profileImage ?? DEFAULT_PROFILE_IMAGE}
             alt="Profile"
             width={36}
             height={36}

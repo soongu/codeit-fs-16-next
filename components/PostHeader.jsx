@@ -3,10 +3,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaEllipsis } from "react-icons/fa6";
 import styles from "./PostDetailModal.module.scss";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 const PostHeader = ({
   username,
-  profileImage = "https://picsum.photos/seed/default/40/40",
+  profileImage,
   onOpenOptions,
 }) => {
   const router = useRouter();
@@ -19,7 +20,8 @@ const PostHeader = ({
       <div className={styles.postUserInfo}>
         <div className={styles.postProfileImage} onClick={handleUserClick} style={{ cursor: "pointer" }}>
           <Image
-            src={profileImage}
+            // 사진이 없는 사람은 profileImage 가 null 로 온다 - 매개변수 기본값은 undefined 일 때만 쓰인다.
+            src={profileImage ?? DEFAULT_PROFILE_IMAGE}
             alt="Profile"
             width={40}
             height={40}
