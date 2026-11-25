@@ -7,7 +7,7 @@ import ProfileImage from "./ProfileImage.jsx";
 import { useProfile } from "@/hooks/useProfile.js";
 import { useMe } from "@/hooks/useMe.js";
 
-// 프로필 헤더 - 사진 · 사용자 이름 · 게시물 수 · 이름을 서버에서 받아 그린다.
+// 프로필 헤더 - 사진 · 사용자 이름 · 세 숫자(게시물 · 팔로워 · 팔로우) · 이름을 서버에서 받아 그린다.
 const ProfileHeader = ({ username }) => {
   const { data: profile, isPending, error } = useProfile(username);
   // 지금 로그인한 사람 - 사이드바가 이미 받아 둔 «나는 누구» 다.
@@ -39,6 +39,12 @@ const ProfileHeader = ({ username }) => {
         <ul className={styles.profileStats}>
           <li>
             게시물 <span className={styles.statsNumber}>{profile.postCount}</span>
+          </li>
+          <li>
+            팔로워 <span className={styles.statsNumber}>{profile.followerCount}</span>
+          </li>
+          <li>
+            팔로우 <span className={styles.statsNumber}>{profile.followingCount}</span>
           </li>
         </ul>
 
