@@ -47,16 +47,28 @@ const MessagePane = ({ conversationId }) => {
   const topSentinelRef = useRef(null);
   // 처음 받은 메시지를 그린 뒤 한 번만 맨 아래로 내린다 - 내렸는지를 기억해 둔다.
   const hasScrolledToBottomRef = useRef(false);
+  // 앞 메시지를 받기 직전의 스크롤 상자 높이와 위치 - 위에 붙인 뒤 보던 메시지로 돌아가는 데 쓴다.
+  const beforePrependRef = useRef(null);
 
   // 화면에 그려지기 «전에» 스크롤 위치를 맞춘다 - 맨 위가 한 번 보였다가 내려가지 않게.
   useLayoutEffect(() => {
     const el = scrollRef.current;
-    if (el === null || isPending || hasScrolledToBottomRef.current) return;
+    if (el === null || isPending) return;
+
+    // 앞 메시지를 위에 붙였으면, 늘어난 높이만큼 내려 보던 메시지가 제자리에 있게 한다.
+    const before = beforePrependRef.current;
+    if (before !== null) {
+      el.scrollTop = el.scrollHeight - before.scrollHeight + before.scrollTop;
+      beforePrependRef.current = null;
+      return;
+    }
+
+    if (hasScrolledToBottomRef.current) return;
 
     // scrollHeight 는 내용 전체의 높이다. scrollTop 을 그만큼 주면 갈 수 있는 맨 아래까지 내려간다.
     el.scrollTop = el.scrollHeight;
     hasScrolledToBottomRef.current = true;
-  }, [isPending, conversation]);
+  }, [isPending, conversation, data]);
 
   // 다른 방에 다녀오면 이 창은 지워지지 않고 숨었다가 다시 보인다. 숨어 있는 동안 스크롤 위치가 0 으로 돌아가니,
   // 숨을 때 «내렸다» 를 지워 두면 다시 보일 때 위의 effect 가 다시 맨 아래로 내린다.
@@ -78,6 +90,8 @@ const MessagePane = ({ conversationId }) => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
+          // 받기 직전의 높이와 위치를 기억해 둔다.
+          beforePrependRef.current = { scrollHeight: root.scrollHeight, scrollTop: root.scrollTop };
           fetchNextPage();
         }
       },
