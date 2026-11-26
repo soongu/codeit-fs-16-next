@@ -78,6 +78,8 @@ export const profileApi = {
   // 이 사람을 팔로우한다 · 팔로우를 그만둔다 - 누가 하는지는 서버가 로그인 정보로 정한다.
   follow: (username) => request(`/profiles/${encodeURIComponent(username)}/followers/me`, { method: "PUT" }),
   unfollow: (username) => request(`/profiles/${encodeURIComponent(username)}/followers/me`, { method: "DELETE" }),
+  // 팔로워 목록(list = "followers")이나 팔로잉 목록(list = "following")의 한 페이지.
+  getFollowList: (username, list, params) => request(`/profiles/${encodeURIComponent(username)}/${list}`, { params }),
 };
 
 export const hashtagApi = {

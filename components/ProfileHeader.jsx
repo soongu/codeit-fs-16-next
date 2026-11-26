@@ -1,9 +1,11 @@
 // ~/instagram-next/components/ProfileHeader.jsx
 "use client";
 
+import { useState } from "react";
 import styles from "./ProfilePage.module.scss";
 import status from "./StatusMessage.module.scss";
 import ProfileImage from "./ProfileImage.jsx";
+import FollowModal from "./FollowModal.jsx";
 import { useProfile } from "@/hooks/useProfile.js";
 import { useMe } from "@/hooks/useMe.js";
 import { useFollow } from "@/hooks/useFollow.js";
@@ -14,6 +16,8 @@ const ProfileHeader = ({ username }) => {
   // 지금 로그인한 사람 - 사이드바가 이미 받아 둔 «나는 누구» 다.
   const { data: me } = useMe();
   const follow = useFollow(username);
+  // 열려 있는 목록 - "followers" · "following" · null(닫힘)
+  const [openList, setOpenList] = useState(null);
 
   if (isPending) {
     return <p className={status.loadingText}>로딩 중...</p>;
@@ -31,44 +35,48 @@ const ProfileHeader = ({ username }) => {
   const editable = me?.username === profile.username;
 
   return (
-    <header className={styles.profileHeader}>
-      {/* 내 프로필일 때만 사진을 눌러 바꿀 수 있다. */}
-      <ProfileImage imageUrl={profile.profileImage} username={profile.username} editable={editable} />
+    <>
+      <header className={styles.profileHeader}>
+        {/* 내 프로필일 때만 사진을 눌러 바꿀 수 있다. */}
+        <ProfileImage imageUrl={profile.profileImage} username={profile.username} editable={editable} />
 
-      <div className={styles.profileInfo}>
-        <div className={styles.profileActions}>
-          <h2 className={styles.username}>{profile.username}</h2>
-          {/* 팔로우 버튼은 남의 프로필에서만 - «나는 누구» 를 받기 전에는 내 프로필인지 몰라서 그리지 않는다. */}
-          {me && !editable && (
-            <div className={styles.actionButtons}>
-              <button
-                className={`${styles.followButton} ${profile.isFollowing ? styles.following : ""}`}
-                onClick={() => follow.mutate(!profile.isFollowing)}
-                disabled={follow.isPending}
-              >
-                {profile.isFollowing ? "팔로잉" : "팔로우"}
-              </button>
-            </div>
-          )}
+        <div className={styles.profileInfo}>
+          <div className={styles.profileActions}>
+            <h2 className={styles.username}>{profile.username}</h2>
+            {/* 팔로우 버튼은 남의 프로필에서만 - «나는 누구» 를 받기 전에는 내 프로필인지 몰라서 그리지 않는다. */}
+            {me && !editable && (
+              <div className={styles.actionButtons}>
+                <button
+                  className={`${styles.followButton} ${profile.isFollowing ? styles.following : ""}`}
+                  onClick={() => follow.mutate(!profile.isFollowing)}
+                  disabled={follow.isPending}
+                >
+                  {profile.isFollowing ? "팔로잉" : "팔로우"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <ul className={styles.profileStats}>
+            <li>
+              게시물 <span className={styles.statsNumber}>{profile.postCount}</span>
+            </li>
+            {/* 숫자를 누르면 그 목록을 모달로 연다. */}
+            <li onClick={() => setOpenList("followers")} style={{ cursor: "pointer" }}>
+              팔로워 <span className={styles.statsNumber}>{profile.followerCount}</span>
+            </li>
+            <li onClick={() => setOpenList("following")} style={{ cursor: "pointer" }}>
+              팔로우 <span className={styles.statsNumber}>{profile.followingCount}</span>
+            </li>
+          </ul>
+
+          <div className={styles.profileBio}>
+            <span className={styles.fullName}>{profile.name}</span>
+          </div>
         </div>
-
-        <ul className={styles.profileStats}>
-          <li>
-            게시물 <span className={styles.statsNumber}>{profile.postCount}</span>
-          </li>
-          <li>
-            팔로워 <span className={styles.statsNumber}>{profile.followerCount}</span>
-          </li>
-          <li>
-            팔로우 <span className={styles.statsNumber}>{profile.followingCount}</span>
-          </li>
-        </ul>
-
-        <div className={styles.profileBio}>
-          <span className={styles.fullName}>{profile.name}</span>
-        </div>
-      </div>
-    </header>
+      </header>
+      {openList && <FollowModal username={profile.username} list={openList} onClose={() => setOpenList(null)} />}
+    </>
   );
 };
 

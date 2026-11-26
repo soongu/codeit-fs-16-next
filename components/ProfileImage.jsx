@@ -8,7 +8,8 @@ import { useUiStore } from "@/stores/useUiStore.js";
 import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // editable 이면(내 프로필이면) 사진을 눌러 새 사진을 고를 수 있다.
-const ProfileImage = ({ imageUrl, username, editable }) => {
+// size 가 "small" 이면 목록 한 줄에 들어가는 작은 사진이다.
+const ProfileImage = ({ imageUrl, username, editable, size = "large" }) => {
   const fileInputRef = useRef(null);
   const { mutate } = useUpdateProfileImage();
   const showToast = useUiStore((state) => state.showToast);
@@ -35,15 +36,18 @@ const ProfileImage = ({ imageUrl, username, editable }) => {
   };
 
   return (
-    <div className={styles.profileImageContainer}>
-      <div className={`${styles.profileImage} ${editable ? styles.editable : ""}`} onClick={handleImageClick}>
+    <div className={`${styles.profileImageContainer} ${size === "small" ? styles.smallContainer : ""}`}>
+      <div
+        className={`${styles.profileImage} ${editable ? styles.editable : ""} ${size === "small" ? styles.smallImage : ""}`}
+        onClick={handleImageClick}
+      >
         <Image
           // 프로필 사진이 없는 사람은 기본 이미지를 보여 준다.
           src={imageUrl ?? DEFAULT_PROFILE_IMAGE}
           alt={`${username}의 프로필`}
-          width={150}
-          height={150}
-          loading="eager"
+          width={size === "small" ? 44 : 150}
+          height={size === "small" ? 44 : 150}
+          loading={size === "small" ? "lazy" : "eager"}
         />
       </div>
       {editable && (
