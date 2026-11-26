@@ -1,0 +1,27 @@
+// ~/instagram-next/hooks/useDmRealtime.js
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getSocket } from "@/services/socket.js";
+
+// 실시간으로 오는 DM 을 듣는다 - 로그인한 화면 전체에서 한 번만 부른다.
+export function useDmRealtime() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // 화면이 열리면 바로 연결한다 - 보내기 전에도 받을 수 있게.
+    const socket = getSocket();
+
+    // 메시지가 오면 그 방의 이력과 대화방 목록을 다시 받는다.
+    const handleMessage = (message) => {
+      queryClient.invalidateQueries({ queryKey: ["messages", message.conversationId] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+    };
+
+    socket.on("dm:message", handleMessage);
+
+    // 화면이 사라지면 듣기를 멈춘다 - 같은 함수를 넘겨야 그 함수만 뗀다.
+    return () => {
+      socket.off("dm:message", handleMessage);
+    };
+  }, [queryClient]);
+}
