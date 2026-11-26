@@ -3,6 +3,10 @@
 const nextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  // /direct 로 오면 대화방 목록 화면 주소로 보낸다 - 주소창의 주소가 바뀐다.
+  async redirects() {
+    return [{ source: "/direct", destination: "/direct/inbox", permanent: false }];
+  },
   async rewrites() {
     return [
       {
