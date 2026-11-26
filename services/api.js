@@ -108,6 +108,8 @@ export const conversationApi = {
   getPage: (params) => request("/conversations", { params }),
   get: (id) => request(`/conversations/${id}`),
   getMessages: (id, params) => request(`/conversations/${id}/messages`, { params }),
+  // 그 사람과의 대화방을 연다 - 없으면 만들고(201), 있으면 있는 방을 준다(200).
+  open: (username) => request("/conversations", { method: "POST", body: { username } }),
 };
 
 export const memberApi = {

@@ -9,6 +9,8 @@ import FollowModal from "./FollowModal.jsx";
 import { useProfile } from "@/hooks/useProfile.js";
 import { useMe } from "@/hooks/useMe.js";
 import { useFollow } from "@/hooks/useFollow.js";
+import { useOpenConversation } from "@/hooks/useOpenConversation.js";
+import { useUiStore } from "@/stores/useUiStore.js";
 
 // 프로필 헤더 - 사진 · 사용자 이름 · 세 숫자(게시물 · 팔로워 · 팔로우) · 이름을 서버에서 받아 그린다.
 const ProfileHeader = ({ username }) => {
@@ -16,6 +18,8 @@ const ProfileHeader = ({ username }) => {
   // 지금 로그인한 사람 - 사이드바가 이미 받아 둔 «나는 누구» 다.
   const { data: me } = useMe();
   const follow = useFollow(username);
+  const openConversation = useOpenConversation();
+  const showToast = useUiStore((state) => state.showToast);
   // 열려 있는 목록 - "followers" · "following" · null(닫힘)
   const [openList, setOpenList] = useState(null);
 
@@ -52,6 +56,17 @@ const ProfileHeader = ({ username }) => {
                   disabled={follow.isPending}
                 >
                   {profile.isFollowing ? "팔로잉" : "팔로우"}
+                </button>
+                <button
+                  className={styles.messageButton}
+                  onClick={() =>
+                    openConversation.mutate(profile.username, {
+                      onError: (error) => showToast(error.message, "error"),
+                    })
+                  }
+                  disabled={openConversation.isPending}
+                >
+                  메시지 보내기
                 </button>
               </div>
             )}
