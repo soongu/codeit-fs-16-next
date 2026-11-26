@@ -1,6 +1,7 @@
 // ~/instagram-next/components/MessagePane.jsx
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
@@ -42,6 +43,19 @@ const MessagePane = ({ conversationId }) => {
   const { data: conversation } = useConversation(conversationId);
   const { data: me } = useMe();
   const { data, isPending } = useMessages(conversationId);
+  const scrollRef = useRef(null);
+  // 처음 받은 메시지를 그린 뒤 한 번만 맨 아래로 내린다 - 내렸는지를 기억해 둔다.
+  const hasScrolledToBottomRef = useRef(false);
+
+  // 화면에 그려지기 «전에» 스크롤 위치를 맞춘다 - 맨 위가 한 번 보였다가 내려가지 않게.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (el === null || isPending || hasScrolledToBottomRef.current) return;
+
+    // scrollHeight 는 내용 전체의 높이다. scrollTop 을 그만큼 주면 갈 수 있는 맨 아래까지 내려간다.
+    el.scrollTop = el.scrollHeight;
+    hasScrolledToBottomRef.current = true;
+  }, [isPending, conversation]);
 
   if (!conversation) return null;
 
@@ -90,7 +104,7 @@ const MessagePane = ({ conversationId }) => {
         </div>
       </header>
 
-      <div className={styles.scroll}>
+      <div className={styles.scroll} ref={scrollRef}>
         {isPending ? (
           <div className={styles.loadingInitial}>
             <div className={styles.spinner} />
