@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/services/socket.js";
 import { addMessage } from "@/hooks/useMessages.js";
-import { moveToTop, readConversation } from "@/hooks/useConversations.js";
+import { moveToTop, readConversation, clearUnread } from "@/hooks/useConversations.js";
 
 // 실시간으로 오는 DM 을 듣는다 - 로그인한 화면 전체에서 한 번만 부른다.
 export function useDmRealtime() {
@@ -40,11 +40,35 @@ export function useDmRealtime() {
       }
     };
 
+    // 누군가 그 방을 읽었다 - 상대가 읽었으면 내가 보낸 메시지를 읽음으로, 내가 다른 탭에서 읽었으면 안 읽음 표시를 지운다.
+    const handleRead = ({ conversationId, readerId }) => {
+      const me = queryClient.getQueryData(["me"]);
+
+      if (readerId === me?.id) {
+        clearUnread(queryClient, conversationId);
+        queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
+        return;
+      }
+
+      queryClient.setQueryData(["messages", conversationId], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            items: page.items.map((m) => (m.senderId === me?.id ? { ...m, isRead: true } : m)),
+          })),
+        };
+      });
+    };
+
     socket.on("dm:message", handleMessage);
+    socket.on("dm:read", handleRead);
 
     // 화면이 사라지거나 주소가 바뀌면 듣기를 멈춘다 - 같은 함수를 넘겨야 그 함수만 뗀다. 주소가 바뀌면 새 주소로 다시 건다.
     return () => {
       socket.off("dm:message", handleMessage);
+      socket.off("dm:read", handleRead);
     };
   }, [queryClient, pathname]);
 }

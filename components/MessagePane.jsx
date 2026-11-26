@@ -178,6 +178,9 @@ const MessagePane = ({ conversationId }) => {
   const messages = (data?.pages.flatMap((page) => page.items) ?? []).reverse();
 
   const { otherUser } = conversation;
+  // 가장 최근 메시지가 내 것이고 상대가 읽었으면 그 아래에 «읽음» 을 둔다.
+  const lastMessage = messages.at(-1);
+  const seen = lastMessage !== undefined && lastMessage.senderId === me?.id && lastMessage.isRead;
 
   return (
     <section className={styles.pane}>
@@ -266,6 +269,9 @@ const MessagePane = ({ conversationId }) => {
             );
           })
         )}
+
+        {/* 인스타그램의 Seen 과 같은 줄이다 - 날짜 줄과 같은 글자 크기와 색을 쓴다. */}
+        {seen && <div style={{ textAlign: "right", padding: "0 16px", fontSize: 12, color: "#737373" }}>읽음</div>}
       </div>
 
       <MessageInput onSend={handleSend} />
