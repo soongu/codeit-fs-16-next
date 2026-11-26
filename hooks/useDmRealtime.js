@@ -1,13 +1,16 @@
 // ~/instagram-next/hooks/useDmRealtime.js
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/services/socket.js";
 import { addMessage } from "@/hooks/useMessages.js";
-import { moveToTop } from "@/hooks/useConversations.js";
+import { moveToTop, readConversation } from "@/hooks/useConversations.js";
 
 // 실시간으로 오는 DM 을 듣는다 - 로그인한 화면 전체에서 한 번만 부른다.
 export function useDmRealtime() {
   const queryClient = useQueryClient();
+  // 지금 보고 있는 주소 - 메시지 창이 열린 방(/direct/t/7 의 7)에 온 메시지는 바로 읽음으로 한다.
+  const pathname = usePathname();
 
   useEffect(() => {
     // 화면이 열리면 바로 연결한다 - 보내기 전에도 받을 수 있게.
@@ -18,23 +21,30 @@ export function useDmRealtime() {
       // 내가 다른 탭에서 보낸 메시지도 온다 - 상대가 보낸 것인지는 «나» 의 번호와 비교해 안다.
       const me = queryClient.getQueryData(["me"]);
       const fromOther = message.senderId !== me?.id;
+      // 상대가 보냈고 그 방의 창을 보고 있으면 받자마자 읽은 것이다.
+      const readNow = fromOther && pathname === `/direct/t/${message.conversationId}`;
 
-      addMessage(queryClient, message);
+      // 바로 읽은 메시지는 읽은 채로 넣는다 - «New messages» 줄은 창을 연 순간에 안 읽었던 메시지 앞에만 둔다.
+      addMessage(queryClient, readNow ? { ...message, isRead: true } : message);
       // 목록에 없던 방이면(지운 방에 새 메시지가 왔거나 아직 안 받은 페이지의 방) 목록을 다시 받는다.
-      if (!moveToTop(queryClient, message, fromOther)) {
+      if (!moveToTop(queryClient, message, fromOther && !readNow)) {
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       }
-      // 사이드바 점 - 안 읽은 방이 새로 생겼는지는 서버에 다시 묻는다(목록을 안 받은 화면에서도 맞게).
-      if (fromOther) {
+
+      if (readNow) {
+        // 서버에도 읽었다고 알린다 - 실패해도 창은 그대로 쓴다. 다음에 창을 열 때 다시 알린다.
+        readConversation(queryClient, message.conversationId).catch(() => {});
+      } else if (fromOther) {
+        // 사이드바 점 - 안 읽은 방이 새로 생겼는지는 서버에 다시 묻는다(목록을 안 받은 화면에서도 맞게).
         queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
       }
     };
 
     socket.on("dm:message", handleMessage);
 
-    // 화면이 사라지면 듣기를 멈춘다 - 같은 함수를 넘겨야 그 함수만 뗀다.
+    // 화면이 사라지거나 주소가 바뀌면 듣기를 멈춘다 - 같은 함수를 넘겨야 그 함수만 뗀다. 주소가 바뀌면 새 주소로 다시 건다.
     return () => {
       socket.off("dm:message", handleMessage);
     };
-  }, [queryClient]);
+  }, [queryClient, pathname]);
 }

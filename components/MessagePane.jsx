@@ -1,18 +1,20 @@
 // ~/instagram-next/components/MessagePane.jsx
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
 import MessageBubble from "./MessageBubble.jsx";
 import DateDivider from "./DateDivider.jsx";
+import NewMessagesDivider from "./NewMessagesDivider.jsx";
 import MessageInput from "./MessageInput.jsx";
 import styles from "./MessagePane.module.scss";
 import { useConversation } from "@/hooks/useConversation.js";
 import { useMessages, addMessage } from "@/hooks/useMessages.js";
 import { useMe } from "@/hooks/useMe.js";
+import { readConversation } from "@/hooks/useConversations.js";
 import { getSocket } from "@/services/socket.js";
 import { useUiStore } from "@/stores/useUiStore.js";
 import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
@@ -40,6 +42,14 @@ const computePosition = (messages, index) => {
   return "last";
 };
 
+// 창을 연 순간 읽음으로 바뀐 메시지 가운데 가장 오래된 것의 번호 - 그 앞에 «New messages» 줄을 둔다.
+// 서버의 이력은 최신 먼저라, 상대가 보낸 메시지를 최신부터 readCount 개 세면 마지막 것이 가장 오래된 것이다.
+const firstNewMessageId = (data, readCount, myId) => {
+  if (!data || readCount <= 0) return null;
+  const fromOther = data.pages.flatMap((page) => page.items).filter((m) => m.senderId !== myId);
+  return fromOther[Math.min(readCount, fromOther.length) - 1]?.id ?? null;
+};
+
 // DM 화면 오른쪽의 메시지 창 - 머리에 그 방의 상대를 보여 준다.
 const MessagePane = ({ conversationId }) => {
   const router = useRouter();
@@ -59,6 +69,27 @@ const MessagePane = ({ conversationId }) => {
   const atBottomRef = useRef(true);
   // 지금 그린 가장 최근 메시지의 번호 - 이 번호가 바뀌면 아래에 새 메시지가 붙은 것이다.
   const newestIdRef = useRef(null);
+  // «New messages» 줄을 둘 메시지의 번호 - 창을 열고 읽음으로 알린 뒤에 정한다.
+  const [newMessageId, setNewMessageId] = useState(null);
+
+  // 이력을 받으면 이 방을 읽음으로 한다 - 다른 방에 다녀와 창이 다시 보일 때도 다시 알린다.
+  useEffect(() => {
+    if (isPending) return;
+
+    let ignore = false;
+    readConversation(queryClient, conversationId)
+      .then((readCount) => {
+        if (ignore) return;
+        // 읽음으로 바뀐 것이 없으면 줄도 없다.
+        const myId = queryClient.getQueryData(["me"])?.id;
+        setNewMessageId(firstNewMessageId(queryClient.getQueryData(["messages", conversationId]), readCount, myId));
+      })
+      .catch(() => {});
+
+    return () => {
+      ignore = true;
+    };
+  }, [conversationId, isPending, queryClient]);
 
   // 화면에 그려지기 «전에» 스크롤 위치를 맞춘다 - 맨 위가 한 번 보였다가 내려가지 않게.
   useLayoutEffect(() => {
@@ -223,6 +254,7 @@ const MessagePane = ({ conversationId }) => {
             return (
               <div key={m.id}>
                 {showDate && <DateDivider dateString={m.createdAt} />}
+                {m.id === newMessageId && <NewMessagesDivider />}
                 <MessageBubble
                   message={m}
                   isMine={isMine}

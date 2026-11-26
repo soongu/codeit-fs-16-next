@@ -108,6 +108,8 @@ export const conversationApi = {
   getPage: (params) => request("/conversations", { params }),
   get: (id) => request(`/conversations/${id}`),
   getMessages: (id, params) => request(`/conversations/${id}/messages`, { params }),
+  // 상대가 보낸 안 읽은 메시지를 모두 읽음으로 - { readCount }
+  markAsRead: (id) => request(`/conversations/${id}/messages/read`, { method: "PATCH" }),
   // 안 읽은 메시지가 있는 내 대화방 수 - { conversationCount }
   getUnread: () => request("/conversations/unread"),
   // 그 사람과의 대화방을 연다 - 없으면 만들고(201), 있으면 있는 방을 준다(200).
