@@ -62,13 +62,23 @@ export function useDmRealtime() {
       });
     };
 
+    // 끊겼던 연결이 다시 이어졌다 - 끊긴 동안 온 메시지는 이벤트로 오지 않았으니 받아 둔 것을 모두 다시 받는다.
+    const handleReconnect = () => {
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
+    };
+
     socket.on("dm:message", handleMessage);
     socket.on("dm:read", handleRead);
+    // 다시 이어진 것은 연결 하나(socket)가 아니라 그 뒤의 관리자(socket.io)가 알린다.
+    socket.io.on("reconnect", handleReconnect);
 
     // 화면이 사라지거나 주소가 바뀌면 듣기를 멈춘다 - 같은 함수를 넘겨야 그 함수만 뗀다. 주소가 바뀌면 새 주소로 다시 건다.
     return () => {
       socket.off("dm:message", handleMessage);
       socket.off("dm:read", handleRead);
+      socket.io.off("reconnect", handleReconnect);
     };
   }, [queryClient, pathname]);
 }
