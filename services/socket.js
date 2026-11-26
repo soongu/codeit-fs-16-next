@@ -8,7 +8,8 @@ let socket = null;
 export function getSocket() {
   if (socket === null) {
     // 주소를 안 주면 이 화면과 같은 주소로 연다 - next.config.mjs 의 rewrites 가 백엔드로 넘긴다.
-    socket = io();
+    // Next.js 는 끝에 / 가 붙은 주소를 / 를 뗀 주소로 보내 버려서(308), 처음부터 / 없이 부른다.
+    socket = io({ addTrailingSlash: false });
   }
 
   return socket;

@@ -38,8 +38,9 @@ const nextConfig = {
         destination: `${process.env.API_URL}/api/v2/conversations/:path*`,
       },
       {
-        source: "/socket.io/:path*",
-        destination: `${process.env.API_URL}/socket.io/:path*`,
+        // 실시간 연결 - 끝에 / 가 없는 주소로 받아 백엔드에는 / 를 붙여 넘긴다.
+        source: "/socket.io",
+        destination: `${process.env.API_URL}/socket.io/`,
       },
       {
         source: "/uploads/:path*",
