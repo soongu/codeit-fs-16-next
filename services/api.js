@@ -106,6 +106,7 @@ export const commentApi = {
 
 export const conversationApi = {
   getPage: (params) => request("/conversations", { params }),
+  get: (id) => request(`/conversations/${id}`),
 };
 
 export const memberApi = {

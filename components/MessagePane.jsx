@@ -5,16 +5,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
 import styles from "./MessagePane.module.scss";
-import { useConversations } from "@/hooks/useConversations.js";
+import { useConversation } from "@/hooks/useConversation.js";
 import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // DM 화면 오른쪽의 메시지 창 - 머리에 그 방의 상대를 보여 준다.
 const MessagePane = ({ conversationId }) => {
   const router = useRouter();
-  const { data } = useConversations();
-
-  // 상대가 누구인지는 왼쪽 목록이 이미 받아 둔 대화방에서 찾는다.
-  const conversation = data?.pages.flatMap((page) => page.items).find((c) => c.id === conversationId);
+  // 상대가 누구인지는 왼쪽 목록에서 찾지 않고 이 방의 정보를 따로 받는다.
+  const { data: conversation } = useConversation(conversationId);
 
   if (!conversation) return null;
 
