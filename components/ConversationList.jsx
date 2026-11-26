@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { FaPenToSquare } from "react-icons/fa6";
 import ConversationItem from "./ConversationItem.jsx";
 import styles from "./ConversationList.module.scss";
@@ -16,6 +17,9 @@ const TABS = [
 
 // DM 화면 왼쪽의 대화방 목록
 const ConversationList = () => {
+  const router = useRouter();
+  // 주소의 번호(/direct/t/7 의 7) - 고른 대화방을 표시하는 데 쓴다. 고르지 않았으면 undefined 다.
+  const { conversationId } = useParams();
   const { data: me } = useMe();
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversations();
   const [activeTab, setActiveTab] = useState("primary");
@@ -92,7 +96,12 @@ const ConversationList = () => {
         ) : (
           <>
             {conversations.map((c) => (
-              <ConversationItem key={c.id} conversation={c} />
+              <ConversationItem
+                key={c.id}
+                conversation={c}
+                isActive={c.id === Number(conversationId)}
+                onClick={() => router.push(`/direct/t/${c.id}`)}
+              />
             ))}
             {hasNextPage && <div ref={sentinelRef} className={styles.sentinel} />}
             {isFetchingNextPage && (
