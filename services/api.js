@@ -104,6 +104,10 @@ export const commentApi = {
   remove: (postId, commentId) => request(`/posts/${postId}/comments/${commentId}`, { method: "DELETE" }),
 };
 
+export const conversationApi = {
+  getPage: (params) => request("/conversations", { params }),
+};
+
 export const memberApi = {
   search: (keyword) => request("/members/search", { params: { keyword } }),
   // 올려 둔 사진의 주소를 내 프로필 사진으로 적는다.
