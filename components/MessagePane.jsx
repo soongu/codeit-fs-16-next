@@ -11,7 +11,7 @@ import DateDivider from "./DateDivider.jsx";
 import MessageInput from "./MessageInput.jsx";
 import styles from "./MessagePane.module.scss";
 import { useConversation } from "@/hooks/useConversation.js";
-import { useMessages } from "@/hooks/useMessages.js";
+import { useMessages, addMessage } from "@/hooks/useMessages.js";
 import { useMe } from "@/hooks/useMe.js";
 import { getSocket } from "@/services/socket.js";
 import { useUiStore } from "@/stores/useUiStore.js";
@@ -55,11 +55,24 @@ const MessagePane = ({ conversationId }) => {
   const hasScrolledToBottomRef = useRef(false);
   // 앞 메시지를 받기 직전의 스크롤 상자 높이와 위치 - 위에 붙인 뒤 보던 메시지로 돌아가는 데 쓴다.
   const beforePrependRef = useRef(null);
+  // 마지막으로 스크롤했을 때 맨 아래에 있었나 - 새 메시지가 오면 맨 아래를 보던 때만 내린다.
+  const atBottomRef = useRef(true);
+  // 지금 그린 가장 최근 메시지의 번호 - 이 번호가 바뀌면 아래에 새 메시지가 붙은 것이다.
+  const newestIdRef = useRef(null);
 
   // 화면에 그려지기 «전에» 스크롤 위치를 맞춘다 - 맨 위가 한 번 보였다가 내려가지 않게.
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (el === null || isPending) return;
+
+    // 아래에 새 메시지가 붙었고 맨 아래를 보고 있었으면 같이 내린다. 위로 올려 옛 메시지를 읽던 중이면 그대로 둔다.
+    const newestId = data?.pages[0]?.items[0]?.id ?? null;
+    const added = newestIdRef.current !== null && newestId !== newestIdRef.current;
+    newestIdRef.current = newestId;
+    if (added && atBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
+      return;
+    }
 
     // 앞 메시지를 위에 붙였으면, 늘어난 높이만큼 내려 보던 메시지가 제자리에 있게 한다.
     const before = beforePrependRef.current;
@@ -117,14 +130,8 @@ const MessagePane = ({ conversationId }) => {
         return;
       }
 
-      const message = result.data;
-
-      // 이력 캐시의 첫 페이지(가장 최근 메시지들)의 맨 앞에 넣는다 - 서버가 주는 차례(최신 먼저)와 같게.
-      queryClient.setQueryData(["messages", conversationId], (old) => {
-        if (!old) return old;
-        const [first, ...rest] = old.pages;
-        return { ...old, pages: [{ ...first, items: [message, ...first.items] }, ...rest] };
-      });
+      // 이력 캐시의 첫 페이지 맨 앞에 넣는다 - dm:message 로 먼저 와 있으면 다시 넣지 않는다.
+      addMessage(queryClient, result.data);
 
       // 내가 보냈으니 맨 아래로 내린다 - «내렸다» 를 지우면 위의 effect 가 다시 내린다.
       hasScrolledToBottomRef.current = false;
@@ -181,7 +188,15 @@ const MessagePane = ({ conversationId }) => {
         </div>
       </header>
 
-      <div className={styles.scroll} ref={scrollRef}>
+      <div
+        className={styles.scroll}
+        ref={scrollRef}
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          // 맨 아래까지 남은 거리가 거의 없으면 맨 아래를 보고 있는 것이다.
+          atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+        }}
+      >
         {hasNextPage && <div ref={topSentinelRef} className={styles.topSentinel} />}
 
         {isFetchingNextPage && (

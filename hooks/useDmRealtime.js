@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/services/socket.js";
+import { addMessage } from "@/hooks/useMessages.js";
 
 // 실시간으로 오는 DM 을 듣는다 - 로그인한 화면 전체에서 한 번만 부른다.
 export function useDmRealtime() {
@@ -13,13 +14,7 @@ export function useDmRealtime() {
 
     // 메시지가 오면 그 방의 이력 캐시에 넣는다 - 받은 메시지를 그대로 쓰니 요청이 없다.
     const handleMessage = (message) => {
-      // 이력의 첫 페이지(가장 최근 메시지들)의 맨 앞에 넣는다 - 서버가 주는 차례(최신 먼저)와 같게.
-      // 그 방의 이력을 아직 안 받았으면(old 가 없으면) 그대로 둔다 - 창을 열 때 받는다.
-      queryClient.setQueryData(["messages", message.conversationId], (old) => {
-        if (!old) return old;
-        const [first, ...rest] = old.pages;
-        return { ...old, pages: [{ ...first, items: [message, ...first.items] }, ...rest] };
-      });
+      addMessage(queryClient, message);
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     };
 
