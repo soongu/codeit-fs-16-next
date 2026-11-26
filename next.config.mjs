@@ -38,6 +38,10 @@ const nextConfig = {
         destination: `${process.env.API_URL}/api/v2/conversations/:path*`,
       },
       {
+        source: "/socket.io/:path*",
+        destination: `${process.env.API_URL}/socket.io/:path*`,
+      },
+      {
         source: "/uploads/:path*",
         destination: `${process.env.API_URL}/uploads/:path*`,
       },

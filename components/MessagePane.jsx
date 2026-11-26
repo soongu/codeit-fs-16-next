@@ -4,13 +4,17 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
 import MessageBubble from "./MessageBubble.jsx";
 import DateDivider from "./DateDivider.jsx";
+import MessageInput from "./MessageInput.jsx";
 import styles from "./MessagePane.module.scss";
 import { useConversation } from "@/hooks/useConversation.js";
 import { useMessages } from "@/hooks/useMessages.js";
 import { useMe } from "@/hooks/useMe.js";
+import { getSocket } from "@/services/socket.js";
+import { useUiStore } from "@/stores/useUiStore.js";
 import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 // 두 시각이 같은 날인가 - 이 컴퓨터의 시간대로 본다.
@@ -39,6 +43,8 @@ const computePosition = (messages, index) => {
 // DM 화면 오른쪽의 메시지 창 - 머리에 그 방의 상대를 보여 준다.
 const MessagePane = ({ conversationId }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const showToast = useUiStore((state) => state.showToast);
   // 상대가 누구인지는 왼쪽 목록에서 찾지 않고 이 방의 정보를 따로 받는다.
   const { data: conversation } = useConversation(conversationId);
   const { data: me } = useMe();
@@ -102,6 +108,31 @@ const MessagePane = ({ conversationId }) => {
 
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, conversation]);
+
+  // 메시지 보내기 - 실시간 연결로 dm:send 를 보내고, 결과(ack)가 오면 그 메시지를 창의 맨 아래에 붙인다.
+  const handleSend = (text) => {
+    getSocket().emit("dm:send", { conversationId, content: text }, (result) => {
+      if (result.error) {
+        showToast(result.error.message, "error");
+        return;
+      }
+
+      const message = result.data;
+
+      // 이력 캐시의 첫 페이지(가장 최근 메시지들)의 맨 앞에 넣는다 - 서버가 주는 차례(최신 먼저)와 같게.
+      queryClient.setQueryData(["messages", conversationId], (old) => {
+        if (!old) return old;
+        const [first, ...rest] = old.pages;
+        return { ...old, pages: [{ ...first, items: [message, ...first.items] }, ...rest] };
+      });
+
+      // 내가 보냈으니 맨 아래로 내린다 - «내렸다» 를 지우면 위의 effect 가 다시 내린다.
+      hasScrolledToBottomRef.current = false;
+
+      // 목록은 서버가 정한 차례(마지막 메시지 시각)대로 다시 받는다 - 이 방이 맨 위로 온다.
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+    });
+  };
 
   if (!conversation) return null;
 
@@ -190,6 +221,8 @@ const MessagePane = ({ conversationId }) => {
           })
         )}
       </div>
+
+      <MessageInput onSend={handleSend} />
     </section>
   );
 };
