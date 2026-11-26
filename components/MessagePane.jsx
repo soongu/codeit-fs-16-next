@@ -57,6 +57,14 @@ const MessagePane = ({ conversationId }) => {
     hasScrolledToBottomRef.current = true;
   }, [isPending, conversation]);
 
+  // 다른 방에 다녀오면 이 창은 지워지지 않고 숨었다가 다시 보인다. 숨어 있는 동안 스크롤 위치가 0 으로 돌아가니,
+  // 숨을 때 «내렸다» 를 지워 두면 다시 보일 때 위의 effect 가 다시 맨 아래로 내린다.
+  useLayoutEffect(() => {
+    return () => {
+      hasScrolledToBottomRef.current = false;
+    };
+  }, []);
+
   if (!conversation) return null;
 
   // 서버는 최신 메시지부터 준다(페이지 안에서도, 페이지끼리도). 화면은 아래가 최신이라 뒤집어서 그린다.
