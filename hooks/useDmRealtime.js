@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/services/socket.js";
+import { conversationApi } from "@/services/api.js";
 import { addMessage } from "@/hooks/useMessages.js";
 import { moveToTop, readConversation, clearUnread } from "@/hooks/useConversations.js";
 
@@ -62,9 +63,38 @@ export function useDmRealtime() {
       });
     };
 
-    // 끊겼던 연결이 다시 이어졌다 - 끊긴 동안 온 메시지는 이벤트로 오지 않았으니 받아 둔 것을 모두 다시 받는다.
+    // 끊겼던 연결이 다시 이어졌다 - 끊긴 동안 온 메시지는 이벤트로 오지 않았다.
+    // 이력을 받아 둔 방마다 가장 최근 메시지의 번호 «뒤» 만 받아 붙인다. 목록과 사이드바 수는 다시 받는다.
     const handleReconnect = () => {
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      for (const [queryKey, data] of queryClient.getQueriesData({ queryKey: ["messages"] })) {
+        const conversationId = queryKey[1];
+        const newest = data?.pages[0]?.items[0];
+
+        // 메시지가 하나도 없던 방은 이어 붙일 번호가 없다 - 다시 받는다.
+        if (!newest) {
+          queryClient.invalidateQueries({ queryKey });
+          continue;
+        }
+
+        conversationApi
+          .getMessages(conversationId, { after: newest.id, limit: 50 })
+          .then(({ items, hasNext }) => {
+            // 끊긴 동안 50개보다 많이 왔으면 이어 붙이지 않고 처음부터 다시 받는다.
+            if (hasNext) {
+              queryClient.invalidateQueries({ queryKey });
+              return;
+            }
+            // 오래된 것부터 오니 차례대로 맨 앞에 넣으면 가장 최근 것이 맨 앞에 온다.
+            // 이력의 한 줄에는 대화방 번호가 없어서 붙여 넣는다.
+            items.forEach((message) => addMessage(queryClient, { ...message, conversationId }));
+            // 보고 있던 방이면 받은 것을 읽음으로 알린다.
+            if (items.length > 0 && pathname === `/direct/t/${conversationId}`) {
+              readConversation(queryClient, conversationId).catch(() => {});
+            }
+          })
+          .catch(() => queryClient.invalidateQueries({ queryKey }));
+      }
+
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
     };
