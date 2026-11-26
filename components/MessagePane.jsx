@@ -1,7 +1,7 @@
 // ~/instagram-next/components/MessagePane.jsx
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
@@ -42,8 +42,9 @@ const MessagePane = ({ conversationId }) => {
   // 상대가 누구인지는 왼쪽 목록에서 찾지 않고 이 방의 정보를 따로 받는다.
   const { data: conversation } = useConversation(conversationId);
   const { data: me } = useMe();
-  const { data, isPending } = useMessages(conversationId);
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useMessages(conversationId);
   const scrollRef = useRef(null);
+  const topSentinelRef = useRef(null);
   // 처음 받은 메시지를 그린 뒤 한 번만 맨 아래로 내린다 - 내렸는지를 기억해 둔다.
   const hasScrolledToBottomRef = useRef(false);
 
@@ -64,6 +65,29 @@ const MessagePane = ({ conversationId }) => {
       hasScrolledToBottomRef.current = false;
     };
   }, []);
+
+  // 맨 위 감지용 요소가 스크롤 상자 안에서 보이면 그 앞 메시지 20개를 받는다.
+  // 목록과 달리 root 를 스크롤 상자로 준다 - 창 전체가 아니라 이 상자 안에서 보이는지를 본다.
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+
+    const target = topSentinelRef.current;
+    const root = scrollRef.current;
+    if (target === null || root === null) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { root },
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, conversation]);
 
   if (!conversation) return null;
 
@@ -113,6 +137,14 @@ const MessagePane = ({ conversationId }) => {
       </header>
 
       <div className={styles.scroll} ref={scrollRef}>
+        {hasNextPage && <div ref={topSentinelRef} className={styles.topSentinel} />}
+
+        {isFetchingNextPage && (
+          <div className={styles.loadingOlder}>
+            <div className={styles.spinner} />
+          </div>
+        )}
+
         {isPending ? (
           <div className={styles.loadingInitial}>
             <div className={styles.spinner} />
