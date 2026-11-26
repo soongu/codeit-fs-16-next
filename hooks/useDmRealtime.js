@@ -64,37 +64,39 @@ export function useDmRealtime() {
     };
 
     // 끊겼던 연결이 다시 이어졌다 - 끊긴 동안 온 메시지는 이벤트로 오지 않았다.
-    // 이력을 받아 둔 방마다 가장 최근 메시지의 번호 «뒤» 만 받아 붙인다. 목록과 사이드바 수는 다시 받는다.
-    const handleReconnect = () => {
-      for (const [queryKey, data] of queryClient.getQueriesData({ queryKey: ["messages"] })) {
-        const conversationId = queryKey[1];
-        const newest = data?.pages[0]?.items[0];
+    // 이력을 받아 둔 방마다 가장 최근 메시지의 번호 «뒤» 만 받아 붙인다. 목록과 사이드바 수는 그다음에 다시 받는다.
+    const fillGap = async ([queryKey, data]) => {
+      const conversationId = queryKey[1];
+      const newest = data?.pages[0]?.items[0];
 
-        // 메시지가 하나도 없던 방은 이어 붙일 번호가 없다 - 다시 받는다.
-        if (!newest) {
-          queryClient.invalidateQueries({ queryKey });
-          continue;
-        }
-
-        conversationApi
-          .getMessages(conversationId, { after: newest.id, limit: 50 })
-          .then(({ items, hasNext }) => {
-            // 끊긴 동안 50개보다 많이 왔으면 이어 붙이지 않고 처음부터 다시 받는다.
-            if (hasNext) {
-              queryClient.invalidateQueries({ queryKey });
-              return;
-            }
-            // 오래된 것부터 오니 차례대로 맨 앞에 넣으면 가장 최근 것이 맨 앞에 온다.
-            // 이력의 한 줄에는 대화방 번호가 없어서 붙여 넣는다.
-            items.forEach((message) => addMessage(queryClient, { ...message, conversationId }));
-            // 보고 있던 방이면 받은 것을 읽음으로 알린다.
-            if (items.length > 0 && pathname === `/direct/t/${conversationId}`) {
-              readConversation(queryClient, conversationId).catch(() => {});
-            }
-          })
-          .catch(() => queryClient.invalidateQueries({ queryKey }));
+      // 메시지가 하나도 없던 방은 이어 붙일 번호가 없다 - 다시 받는다.
+      if (!newest) {
+        await queryClient.invalidateQueries({ queryKey });
+        return;
       }
 
+      try {
+        const { items, hasNext } = await conversationApi.getMessages(conversationId, { after: newest.id, limit: 50 });
+        // 끊긴 동안 50개보다 많이 왔으면 이어 붙이지 않고 처음부터 다시 받는다.
+        if (hasNext) {
+          await queryClient.invalidateQueries({ queryKey });
+          return;
+        }
+        // 오래된 것부터 오니 차례대로 맨 앞에 넣으면 가장 최근 것이 맨 앞에 온다.
+        // 이력의 한 줄에는 대화방 번호가 없어서 붙여 넣는다.
+        items.forEach((message) => addMessage(queryClient, { ...message, conversationId }));
+        // 보고 있던 방이면 받은 것을 읽음으로 알린다.
+        if (items.length > 0 && pathname === `/direct/t/${conversationId}`) {
+          await readConversation(queryClient, conversationId);
+        }
+      } catch {
+        await queryClient.invalidateQueries({ queryKey });
+      }
+    };
+
+    const handleReconnect = async () => {
+      await Promise.all(queryClient.getQueriesData({ queryKey: ["messages"] }).map(fillGap));
+      // 이력을 채우고 읽음으로 알린 «뒤에» 다시 받는다 - 먼저 받으면 읽기 전의 안 읽은 수가 목록을 덮는다.
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
     };
