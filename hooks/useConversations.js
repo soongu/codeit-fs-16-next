@@ -13,8 +13,9 @@ export function useConversations() {
 }
 
 // 메시지가 온 방을 목록 맨 위로 올리고 미리보기와 시각을 바꾼다 - 받은 메시지에 필요한 값이 다 있다.
+// 상대가 보낸 메시지면(fromOther) 안 읽은 수를 하나 늘린다.
 // 받아 둔 페이지에 그 방이 없으면 false 를 돌려준다 - 부른 쪽이 목록을 다시 받는다.
-export function moveToTop(queryClient, message) {
+export function moveToTop(queryClient, message, fromOther) {
   let found = false;
   queryClient.setQueryData(["conversations"], (old) => {
     if (!old) return old;
@@ -23,7 +24,12 @@ export function moveToTop(queryClient, message) {
     found = true;
 
     const { id, senderId, content, createdAt } = message;
-    const moved = { ...row, lastMessage: { id, senderId, content, createdAt }, lastMessageAt: createdAt };
+    const moved = {
+      ...row,
+      lastMessage: { id, senderId, content, createdAt },
+      lastMessageAt: createdAt,
+      unreadCount: fromOther ? row.unreadCount + 1 : row.unreadCount,
+    };
     // 그 방이 있던 페이지에서 빼고 첫 페이지 맨 앞에 넣는다.
     const pages = old.pages.map((page) => ({ ...page, items: page.items.filter((c) => c.id !== row.id) }));
     pages[0] = { ...pages[0], items: [moved, ...pages[0].items] };

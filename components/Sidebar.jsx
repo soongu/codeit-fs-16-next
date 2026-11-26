@@ -9,6 +9,7 @@ import SearchPanel from "./SearchPanel.jsx";
 import SidebarNav from "./SidebarNav.jsx";
 import ProfileLink from "./ProfileLink.jsx";
 import MoreButton from "./MoreButton.jsx";
+import MessagesBadge from "./MessagesBadge.jsx";
 import styles from "./Sidebar.module.scss";
 
 function Sidebar() {
@@ -32,6 +33,7 @@ function Sidebar() {
           <NavLink href="/direct/inbox" className={styles.menuItem}>
             <span className={styles.iconWrap}>
               <FaRegPaperPlane size={24} />
+              <MessagesBadge />
             </span>
             <span className={styles.menuText}>메시지</span>
           </NavLink>

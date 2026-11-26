@@ -15,10 +15,18 @@ export function useDmRealtime() {
 
     // 메시지가 오면 그 방의 이력 캐시에 넣고 목록에서 그 방을 맨 위로 올린다 - 받은 메시지를 그대로 쓰니 요청이 없다.
     const handleMessage = (message) => {
+      // 내가 다른 탭에서 보낸 메시지도 온다 - 상대가 보낸 것인지는 «나» 의 번호와 비교해 안다.
+      const me = queryClient.getQueryData(["me"]);
+      const fromOther = message.senderId !== me?.id;
+
       addMessage(queryClient, message);
       // 목록에 없던 방이면(지운 방에 새 메시지가 왔거나 아직 안 받은 페이지의 방) 목록을 다시 받는다.
-      if (!moveToTop(queryClient, message)) {
+      if (!moveToTop(queryClient, message, fromOther)) {
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      }
+      // 사이드바 점 - 안 읽은 방이 새로 생겼는지는 서버에 다시 묻는다(목록을 안 받은 화면에서도 맞게).
+      if (fromOther) {
+        queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
       }
     };
 
