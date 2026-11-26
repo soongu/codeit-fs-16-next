@@ -136,8 +136,7 @@ const MessagePane = ({ conversationId }) => {
       // 내가 보냈으니 맨 아래로 내린다 - «내렸다» 를 지우면 위의 effect 가 다시 내린다.
       hasScrolledToBottomRef.current = false;
 
-      // 목록은 서버가 정한 차례(마지막 메시지 시각)대로 다시 받는다 - 이 방이 맨 위로 온다.
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      // 목록은 따로 고치지 않는다 - 내가 보낸 메시지도 dm:message 로 내 탭에 와서 그 방을 맨 위로 올린다.
     });
   };
 
