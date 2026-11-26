@@ -46,7 +46,7 @@ const FollowModal = ({ username, list, onClose }) => {
           </button>
         </div>
         <div className={styles.userList}>
-          {data?.pages.flatMap((page) => page.items).map((user) => <FollowUser key={user.id} user={user} />)}
+          {data?.pages.flatMap((page) => page.items).map((user) => <FollowUser key={user.id} user={user} onClose={onClose} />)}
           {hasNextPage ? <div ref={loadMoreRef} className={status.sentinel} aria-hidden /> : null}
           {(isPending || isFetchingNextPage) && <div className={styles.loadingSpinner}>로딩중...</div>}
           {error && <p className={status.errorText}>목록을 불러오지 못했습니다.</p>}
