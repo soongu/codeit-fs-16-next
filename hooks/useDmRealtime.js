@@ -16,7 +16,10 @@ export function useDmRealtime() {
     // 메시지가 오면 그 방의 이력 캐시에 넣고 목록에서 그 방을 맨 위로 올린다 - 받은 메시지를 그대로 쓰니 요청이 없다.
     const handleMessage = (message) => {
       addMessage(queryClient, message);
-      moveToTop(queryClient, message);
+      // 목록에 없던 방이면(지운 방에 새 메시지가 왔거나 아직 안 받은 페이지의 방) 목록을 다시 받는다.
+      if (!moveToTop(queryClient, message)) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      }
     };
 
     socket.on("dm:message", handleMessage);

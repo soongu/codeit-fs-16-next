@@ -13,11 +13,14 @@ export function useConversations() {
 }
 
 // 메시지가 온 방을 목록 맨 위로 올리고 미리보기와 시각을 바꾼다 - 받은 메시지에 필요한 값이 다 있다.
+// 받아 둔 페이지에 그 방이 없으면 false 를 돌려준다 - 부른 쪽이 목록을 다시 받는다.
 export function moveToTop(queryClient, message) {
+  let found = false;
   queryClient.setQueryData(["conversations"], (old) => {
     if (!old) return old;
     const row = old.pages.flatMap((page) => page.items).find((c) => c.id === message.conversationId);
     if (!row) return old;
+    found = true;
 
     const { id, senderId, content, createdAt } = message;
     const moved = { ...row, lastMessage: { id, senderId, content, createdAt }, lastMessageAt: createdAt };
@@ -26,4 +29,5 @@ export function moveToTop(queryClient, message) {
     pages[0] = { ...pages[0], items: [moved, ...pages[0].items] };
     return { ...old, pages };
   });
+  return found;
 }
