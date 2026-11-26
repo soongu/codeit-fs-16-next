@@ -11,9 +11,15 @@ export function useDmRealtime() {
     // 화면이 열리면 바로 연결한다 - 보내기 전에도 받을 수 있게.
     const socket = getSocket();
 
-    // 메시지가 오면 그 방의 이력과 대화방 목록을 다시 받는다.
+    // 메시지가 오면 그 방의 이력 캐시에 넣는다 - 받은 메시지를 그대로 쓰니 요청이 없다.
     const handleMessage = (message) => {
-      queryClient.invalidateQueries({ queryKey: ["messages", message.conversationId] });
+      // 이력의 첫 페이지(가장 최근 메시지들)의 맨 앞에 넣는다 - 서버가 주는 차례(최신 먼저)와 같게.
+      // 그 방의 이력을 아직 안 받았으면(old 가 없으면) 그대로 둔다 - 창을 열 때 받는다.
+      queryClient.setQueryData(["messages", message.conversationId], (old) => {
+        if (!old) return old;
+        const [first, ...rest] = old.pages;
+        return { ...old, pages: [{ ...first, items: [message, ...first.items] }, ...rest] };
+      });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     };
 
