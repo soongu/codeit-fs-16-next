@@ -9,6 +9,7 @@ import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
 import MessageBubble from "./MessageBubble.jsx";
 import DateDivider from "./DateDivider.jsx";
 import NewMessagesDivider from "./NewMessagesDivider.jsx";
+import TypingBubble from "./TypingBubble.jsx";
 import MessageInput from "./MessageInput.jsx";
 import styles from "./MessagePane.module.scss";
 import { useConversation } from "@/hooks/useConversation.js";
@@ -71,6 +72,46 @@ const MessagePane = ({ conversationId }) => {
   const newestIdRef = useRef(null);
   // «New messages» 줄을 둘 메시지의 번호 - 창을 열고 읽음으로 알린 뒤에 정한다.
   const [newMessageId, setNewMessageId] = useState(null);
+  // 상대가 이 방에서 입력 중인가
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+
+  const myId = me?.id;
+
+  // 상대의 «입력 중» 을 듣는다 - 이 방의 알림만 본다. 5초 동안 새 알림이 없으면 스스로 지운다(멈췄다는 알림을 놓쳐도).
+  // 상대의 메시지가 오면 다 친 것이라 바로 지운다.
+  useEffect(() => {
+    const socket = getSocket();
+    let timer = null;
+
+    const handleTyping = (payload) => {
+      if (payload.conversationId !== conversationId) return;
+      clearTimeout(timer);
+      setIsOtherTyping(payload.typing);
+      if (payload.typing) timer = setTimeout(() => setIsOtherTyping(false), 5000);
+    };
+    const handleMessage = (message) => {
+      if (message.conversationId !== conversationId || message.senderId === myId) return;
+      clearTimeout(timer);
+      setIsOtherTyping(false);
+    };
+
+    socket.on("dm:typing", handleTyping);
+    socket.on("dm:message", handleMessage);
+
+    return () => {
+      socket.off("dm:typing", handleTyping);
+      socket.off("dm:message", handleMessage);
+      clearTimeout(timer);
+      // 다른 방에 다녀오는 동안은 듣지 않으니 보이던 말풍선을 지워 둔다.
+      setIsOtherTyping(false);
+    };
+  }, [conversationId, myId]);
+
+  // 입력 중 말풍선이 뜨면 맨 아래를 보던 때만 내려 보이게 한다.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (isOtherTyping && el !== null && atBottomRef.current) el.scrollTop = el.scrollHeight;
+  }, [isOtherTyping]);
 
   // 이력을 받으면 이 방을 읽음으로 한다 - 다른 방에 다녀와 창이 다시 보일 때도 다시 알린다.
   useEffect(() => {
@@ -272,9 +313,11 @@ const MessagePane = ({ conversationId }) => {
 
         {/* 인스타그램의 Seen 과 같은 줄이다 - 날짜 줄과 같은 글자 크기와 색을 쓴다. */}
         {seen && <div style={{ textAlign: "right", padding: "0 16px", fontSize: 12, color: "#737373" }}>읽음</div>}
+
+        {isOtherTyping && <TypingBubble avatarUrl={otherUser.profileImage} />}
       </div>
 
-      <MessageInput onSend={handleSend} />
+      <MessageInput onSend={handleSend} conversationId={conversationId} />
     </section>
   );
 };
