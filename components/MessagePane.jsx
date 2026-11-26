@@ -4,17 +4,50 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
+import MessageBubble from "./MessageBubble.jsx";
+import DateDivider from "./DateDivider.jsx";
 import styles from "./MessagePane.module.scss";
 import { useConversation } from "@/hooks/useConversation.js";
+import { useMessages } from "@/hooks/useMessages.js";
+import { useMe } from "@/hooks/useMe.js";
 import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
+
+// 두 시각이 같은 날인가 - 이 컴퓨터의 시간대로 본다.
+const isSameDay = (a, b) => {
+  if (!a || !b) return false;
+  const da = new Date(a);
+  const db = new Date(b);
+  return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
+};
+
+// 같은 사람이 같은 날 잇달아 보낸 말풍선 묶음에서 이 말풍선의 자리 - single · first · middle · last
+const computePosition = (messages, index) => {
+  const cur = messages[index];
+  const prev = messages[index - 1];
+  const next = messages[index + 1];
+
+  const sameAsPrev = prev && prev.senderId === cur.senderId && isSameDay(prev.createdAt, cur.createdAt);
+  const sameAsNext = next && next.senderId === cur.senderId && isSameDay(next.createdAt, cur.createdAt);
+
+  if (!sameAsPrev && !sameAsNext) return "single";
+  if (!sameAsPrev && sameAsNext) return "first";
+  if (sameAsPrev && sameAsNext) return "middle";
+  return "last";
+};
 
 // DM 화면 오른쪽의 메시지 창 - 머리에 그 방의 상대를 보여 준다.
 const MessagePane = ({ conversationId }) => {
   const router = useRouter();
   // 상대가 누구인지는 왼쪽 목록에서 찾지 않고 이 방의 정보를 따로 받는다.
   const { data: conversation } = useConversation(conversationId);
+  const { data: me } = useMe();
+  const { data, isPending } = useMessages(conversationId);
 
   if (!conversation) return null;
+
+  // 서버는 최신 메시지부터 준다(페이지 안에서도, 페이지끼리도). 화면은 아래가 최신이라 뒤집어서 그린다.
+  // reverse() 는 배열 자체를 바꾸지만, flatMap 이 새로 만든 배열이라 캐시의 페이지는 그대로다.
+  const messages = (data?.pages.flatMap((page) => page.items) ?? []).reverse();
 
   const { otherUser } = conversation;
 
@@ -57,7 +90,38 @@ const MessagePane = ({ conversationId }) => {
         </div>
       </header>
 
-      <div className={styles.scroll}></div>
+      <div className={styles.scroll}>
+        {isPending ? (
+          <div className={styles.loadingInitial}>
+            <div className={styles.spinner} />
+          </div>
+        ) : messages.length === 0 ? (
+          <div className={styles.empty}>아직 메시지가 없습니다. 대화를 시작해 보세요!</div>
+        ) : (
+          messages.map((m, idx) => {
+            const isMine = m.senderId === me?.id;
+            const prev = messages[idx - 1];
+            // 앞 메시지와 날짜가 다르면(또는 맨 위 메시지면) 날짜 줄을 먼저 넣는다.
+            const showDate = !prev || !isSameDay(prev.createdAt, m.createdAt);
+            const position = computePosition(messages, idx);
+            // 상대 사진은 묶음의 마지막 말풍선 옆에만 둔다.
+            const showAvatar = !isMine && position !== "first" && position !== "middle";
+
+            return (
+              <div key={m.id}>
+                {showDate && <DateDivider dateString={m.createdAt} />}
+                <MessageBubble
+                  message={m}
+                  isMine={isMine}
+                  showAvatar={showAvatar}
+                  avatarUrl={otherUser.profileImage}
+                  position={position}
+                />
+              </div>
+            );
+          })
+        )}
+      </div>
     </section>
   );
 };
