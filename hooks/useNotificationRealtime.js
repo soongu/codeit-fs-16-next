@@ -14,6 +14,9 @@ export function useNotificationRealtime() {
 
     // 새 알림이 왔다.
     const handleNew = () => {
+      // 받아 둔 알림 목록은 처음부터 다시 받는다.
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+
       // 패널을 보고 있으면 방금 온 알림도 본 것이다 - 서버에도 다시 «봤다» 고 알리고 점은 그 응답(0)으로.
       // 지금 패널이 열려 있는지는 이벤트가 온 그 순간의 값을 store 에서 바로 읽는다.
       if (useUiStore.getState().isNotificationOpen) {
@@ -29,6 +32,7 @@ export function useNotificationRealtime() {
 
     // 알림이 사라졌다(좋아요 취소 등) - 그 알림이 아직 안 본 알림이었을 수 있으니 수를 다시 묻는다.
     const handleRemoved = () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["unseenNotifications"] });
     };
 
