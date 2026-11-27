@@ -1,0 +1,107 @@
+// Sidebar 가 position:fixed 이므로 DirectPage 도 fixed 로 붙여
+// 그 오른쪽 영역을 전부 차지하도록 한다.
+// Sidebar 의 breakpoint(1263px) 에 맞춰 left 값을 조정.
+.container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 244px;
+  right: 0;
+  display: flex;
+  background-color: #fff;
+  z-index: 50;
+}
+
+@media (max-width: 1263px) {
+  .container {
+    left: 72px;
+  }
+}
+
+// 모바일: List 와 Pane 을 겹쳐놓고 상태에 따라 하나만 보인다.
+@media (max-width: 768px) {
+  .container {
+    left: 0;
+  }
+
+  // 대화 미선택 → List 만
+  .container:not(.hasSelection) .pane {
+    display: none;
+  }
+
+  // 대화 선택 → Pane 만
+  .container.hasSelection .list {
+    display: none;
+  }
+}
+
+// List / Pane 슬롯 — 너비를 이 컨테이너에서 제어
+.list {
+  flex-shrink: 0;
+}
+
+.pane {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .list,
+  .pane {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 360px;
+  padding: 40px;
+}
+
+.emptyIcon {
+  width: 96px;
+  height: 96px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transform: rotate(15deg);
+
+  svg {
+    transform: rotate(-15deg);
+  }
+}
+
+.emptyTitle {
+  font-size: 22px;
+  font-weight: 400;
+  margin: 0 0 8px;
+  color: #000;
+}
+
+.emptyHint {
+  font-size: 14px;
+  color: #737373;
+  margin: 0 0 20px;
+}
+
+.placeholder {
+  color: #737373;
+  font-size: 14px;
+}

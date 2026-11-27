@@ -1,0 +1,119 @@
+// ~/instagram-next/components/ConversationList.jsx
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { FaPenToSquare } from "react-icons/fa6";
+import ConversationItem from "./ConversationItem.jsx";
+import styles from "./ConversationList.module.scss";
+import { useConversations } from "@/hooks/useConversations.js";
+import { useMe } from "@/hooks/useMe.js";
+
+const TABS = [
+  { key: "primary", label: "Primary" },
+  { key: "general", label: "General" },
+  { key: "requests", label: "요청" },
+];
+
+// DM 화면 왼쪽의 대화방 목록
+const ConversationList = () => {
+  const router = useRouter();
+  // 주소의 번호(/direct/t/7 의 7) - 고른 대화방을 표시하는 데 쓴다. 고르지 않았으면 undefined 다.
+  const { conversationId } = useParams();
+  const { data: me } = useMe();
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversations();
+  const [activeTab, setActiveTab] = useState("primary");
+  const sentinelRef = useRef(null);
+
+  // 목록 맨 아래 감지용 요소가 보이면 다음 20개를 받는다 - 팔로워 목록과 같은 방법이다.
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) {
+      return;
+    }
+
+    const target = sentinelRef.current;
+    if (target === null) {
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchNextPage();
+      }
+    });
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const conversations = data?.pages.flatMap((page) => page.items) ?? [];
+
+  return (
+    <aside className={styles.container}>
+      <header className={styles.header}>
+        <button type="button" className={styles.usernameButton}>
+          <span className={styles.username}>{me?.username ?? ""}</span>
+          <span className={styles.caret}>▾</span>
+        </button>
+        <button type="button" className={styles.composeButton} aria-label="새 메시지">
+          <FaPenToSquare size={20} />
+        </button>
+      </header>
+
+      <nav className={styles.tabs}>
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            className={`${styles.tab} ${activeTab === tab.key ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      <div className={styles.search}>
+        <input type="text" placeholder="검색" className={styles.searchInput} disabled />
+      </div>
+
+      <div className={styles.listScroll}>
+        {isPending ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className={styles.skeletonItem}>
+              <div className={styles.skeletonAvatar} />
+              <div className={styles.skeletonText}>
+                <div className={styles.skeletonLine} />
+                <div className={styles.skeletonLineShort} />
+              </div>
+            </div>
+          ))
+        ) : activeTab !== "primary" ? (
+          <div className={styles.emptyState}>준비 중입니다</div>
+        ) : conversations.length === 0 ? (
+          <div className={styles.emptyState}>대화방이 없습니다</div>
+        ) : (
+          <>
+            {conversations.map((c) => (
+              <ConversationItem
+                key={c.id}
+                conversation={c}
+                isActive={c.id === Number(conversationId)}
+                onClick={() => router.push(`/direct/t/${c.id}`)}
+              />
+            ))}
+            {hasNextPage && <div ref={sentinelRef} className={styles.sentinel} />}
+            {isFetchingNextPage && (
+              <div className={styles.loadingMore}>
+                <div className={styles.spinner} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </aside>
+  );
+};
+
+export default ConversationList;

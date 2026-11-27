@@ -3,6 +3,10 @@
 const nextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  // /direct 로 오면 대화방 목록 화면 주소로 보낸다 - 주소창의 주소가 바뀐다.
+  async redirects() {
+    return [{ source: "/direct", destination: "/direct/inbox", permanent: false }];
+  },
   async rewrites() {
     return [
       {
@@ -28,6 +32,19 @@ const nextConfig = {
       {
         source: "/api/v2/members/:path*",
         destination: `${process.env.API_URL}/api/v2/members/:path*`,
+      },
+      {
+        source: "/api/v2/conversations/:path*",
+        destination: `${process.env.API_URL}/api/v2/conversations/:path*`,
+      },
+      {
+        source: "/api/v2/notifications/:path*",
+        destination: `${process.env.API_URL}/api/v2/notifications/:path*`,
+      },
+      {
+        // 실시간 연결 - 끝에 / 가 없는 주소로 받아 백엔드에는 / 를 붙여 넘긴다.
+        source: "/socket.io",
+        destination: `${process.env.API_URL}/socket.io/`,
       },
       {
         source: "/uploads/:path*",

@@ -1,14 +1,17 @@
 // ~/instagram-next/components/Sidebar.jsx
 import Link from "next/link";
-import { FaHouse } from "react-icons/fa6";
+import { FaHouse, FaRegPaperPlane } from "react-icons/fa6";
 import InstagramLogo from "./InstagramLogo.jsx";
 import NavLink from "./NavLink.jsx";
 import CreateButton from "./CreateButton.jsx";
 import SearchButton from "./SearchButton.jsx";
 import SearchPanel from "./SearchPanel.jsx";
+import NotificationButton from "./NotificationButton.jsx";
+import NotificationPanel from "./NotificationPanel.jsx";
 import SidebarNav from "./SidebarNav.jsx";
 import ProfileLink from "./ProfileLink.jsx";
 import MoreButton from "./MoreButton.jsx";
+import MessagesBadge from "./MessagesBadge.jsx";
 import styles from "./Sidebar.module.scss";
 
 function Sidebar() {
@@ -29,6 +32,16 @@ function Sidebar() {
 
           <SearchButton />
 
+          <NavLink href="/direct/inbox" className={styles.menuItem}>
+            <span className={styles.iconWrap}>
+              <FaRegPaperPlane size={24} />
+              <MessagesBadge />
+            </span>
+            <span className={styles.menuText}>메시지</span>
+          </NavLink>
+
+          <NotificationButton />
+
           <CreateButton />
 
           <ProfileLink />
@@ -40,6 +53,7 @@ function Sidebar() {
       </SidebarNav>
 
       <SearchPanel />
+      <NotificationPanel />
     </>
   );
 }

@@ -104,6 +104,29 @@ export const commentApi = {
   remove: (postId, commentId) => request(`/posts/${postId}/comments/${commentId}`, { method: "DELETE" }),
 };
 
+export const conversationApi = {
+  getPage: (params) => request("/conversations", { params }),
+  get: (id) => request(`/conversations/${id}`),
+  getMessages: (id, params) => request(`/conversations/${id}/messages`, { params }),
+  // 상대가 보낸 안 읽은 메시지를 모두 읽음으로 - { readCount }
+  markAsRead: (id) => request(`/conversations/${id}/messages/read`, { method: "PATCH" }),
+  // 안 읽은 메시지가 있는 내 대화방 수 - { conversationCount }
+  getUnread: () => request("/conversations/unread"),
+  // 그 사람과의 대화방을 연다 - 없으면 만들고(201), 있으면 있는 방을 준다(200).
+  open: (username) => request("/conversations", { method: "POST", body: { username } }),
+};
+
+export const notificationApi = {
+  // 내 알림 목록의 한 페이지 - 가장 최근 알림이 먼저다.
+  getPage: (params) => request("/notifications", { params }),
+  // 알림 하나를 읽음으로 - { id, isRead: true }
+  markAsRead: (id) => request(`/notifications/${id}/read`, { method: "PATCH" }),
+  // 아직 안 본 알림 수 - { unseenCount }
+  getUnseen: () => request("/notifications/unseen"),
+  // 알림 패널을 열었다 - 지금까지 온 알림을 모두 본 것으로 친다.
+  markSeen: () => request("/notifications/seen", { method: "PATCH" }),
+};
+
 export const memberApi = {
   search: (keyword) => request("/members/search", { params: { keyword } }),
   // 올려 둔 사진의 주소를 내 프로필 사진으로 적는다.

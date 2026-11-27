@@ -1,0 +1,325 @@
+// ~/instagram-next/components/MessagePane.jsx
+"use client";
+
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { FaPhone, FaVideo, FaCircleInfo, FaChevronLeft } from "react-icons/fa6";
+import MessageBubble from "./MessageBubble.jsx";
+import DateDivider from "./DateDivider.jsx";
+import NewMessagesDivider from "./NewMessagesDivider.jsx";
+import TypingBubble from "./TypingBubble.jsx";
+import MessageInput from "./MessageInput.jsx";
+import styles from "./MessagePane.module.scss";
+import { useConversation } from "@/hooks/useConversation.js";
+import { useMessages, addMessage } from "@/hooks/useMessages.js";
+import { useMe } from "@/hooks/useMe.js";
+import { readConversation } from "@/hooks/useConversations.js";
+import { getSocket } from "@/services/socket.js";
+import { useUiStore } from "@/stores/useUiStore.js";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
+
+// 두 시각이 같은 날인가 - 이 컴퓨터의 시간대로 본다.
+const isSameDay = (a, b) => {
+  if (!a || !b) return false;
+  const da = new Date(a);
+  const db = new Date(b);
+  return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
+};
+
+// 같은 사람이 같은 날 잇달아 보낸 말풍선 묶음에서 이 말풍선의 자리 - single · first · middle · last
+const computePosition = (messages, index) => {
+  const cur = messages[index];
+  const prev = messages[index - 1];
+  const next = messages[index + 1];
+
+  const sameAsPrev = prev && prev.senderId === cur.senderId && isSameDay(prev.createdAt, cur.createdAt);
+  const sameAsNext = next && next.senderId === cur.senderId && isSameDay(next.createdAt, cur.createdAt);
+
+  if (!sameAsPrev && !sameAsNext) return "single";
+  if (!sameAsPrev && sameAsNext) return "first";
+  if (sameAsPrev && sameAsNext) return "middle";
+  return "last";
+};
+
+// 창을 연 순간 읽음으로 바뀐 메시지 가운데 가장 오래된 것의 번호 - 그 앞에 «New messages» 줄을 둔다.
+// 서버의 이력은 최신 먼저라, 상대가 보낸 메시지를 최신부터 readCount 개 세면 마지막 것이 가장 오래된 것이다.
+const firstNewMessageId = (data, readCount, myId) => {
+  if (!data || readCount <= 0) return null;
+  const fromOther = data.pages.flatMap((page) => page.items).filter((m) => m.senderId !== myId);
+  return fromOther[Math.min(readCount, fromOther.length) - 1]?.id ?? null;
+};
+
+// DM 화면 오른쪽의 메시지 창 - 머리에 그 방의 상대를 보여 준다.
+const MessagePane = ({ conversationId }) => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const showToast = useUiStore((state) => state.showToast);
+  // 상대가 누구인지는 왼쪽 목록에서 찾지 않고 이 방의 정보를 따로 받는다.
+  const { data: conversation } = useConversation(conversationId);
+  const { data: me } = useMe();
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useMessages(conversationId);
+  const scrollRef = useRef(null);
+  const topSentinelRef = useRef(null);
+  // 처음 받은 메시지를 그린 뒤 한 번만 맨 아래로 내린다 - 내렸는지를 기억해 둔다.
+  const hasScrolledToBottomRef = useRef(false);
+  // 앞 메시지를 받기 직전의 스크롤 상자 높이와 위치 - 위에 붙인 뒤 보던 메시지로 돌아가는 데 쓴다.
+  const beforePrependRef = useRef(null);
+  // 마지막으로 스크롤했을 때 맨 아래에 있었나 - 새 메시지가 오면 맨 아래를 보던 때만 내린다.
+  const atBottomRef = useRef(true);
+  // 지금 그린 가장 최근 메시지의 번호 - 이 번호가 바뀌면 아래에 새 메시지가 붙은 것이다.
+  const newestIdRef = useRef(null);
+  // «New messages» 줄을 둘 메시지의 번호 - 창을 열고 읽음으로 알린 뒤에 정한다.
+  const [newMessageId, setNewMessageId] = useState(null);
+  // 상대가 이 방에서 입력 중인가
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+
+  const myId = me?.id;
+
+  // 상대의 «입력 중» 을 듣는다 - 이 방의 알림만 본다. 5초 동안 새 알림이 없으면 스스로 지운다(멈췄다는 알림을 놓쳐도).
+  // 상대의 메시지가 오면 다 친 것이라 바로 지운다.
+  useEffect(() => {
+    const socket = getSocket();
+    let timer = null;
+
+    const handleTyping = (payload) => {
+      if (payload.conversationId !== conversationId) return;
+      clearTimeout(timer);
+      setIsOtherTyping(payload.typing);
+      if (payload.typing) timer = setTimeout(() => setIsOtherTyping(false), 5000);
+    };
+    const handleMessage = (message) => {
+      if (message.conversationId !== conversationId || message.senderId === myId) return;
+      clearTimeout(timer);
+      setIsOtherTyping(false);
+    };
+
+    socket.on("dm:typing", handleTyping);
+    socket.on("dm:message", handleMessage);
+
+    return () => {
+      socket.off("dm:typing", handleTyping);
+      socket.off("dm:message", handleMessage);
+      clearTimeout(timer);
+      // 다른 방에 다녀오는 동안은 듣지 않으니 보이던 말풍선을 지워 둔다.
+      setIsOtherTyping(false);
+    };
+  }, [conversationId, myId]);
+
+  // 입력 중 말풍선이 뜨면 맨 아래를 보던 때만 내려 보이게 한다.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (isOtherTyping && el !== null && atBottomRef.current) el.scrollTop = el.scrollHeight;
+  }, [isOtherTyping]);
+
+  // 이력을 받으면 이 방을 읽음으로 한다 - 다른 방에 다녀와 창이 다시 보일 때도 다시 알린다.
+  useEffect(() => {
+    if (isPending) return;
+
+    let ignore = false;
+    readConversation(queryClient, conversationId)
+      .then((readCount) => {
+        if (ignore) return;
+        // 읽음으로 바뀐 것이 없으면 줄도 없다.
+        const myId = queryClient.getQueryData(["me"])?.id;
+        setNewMessageId(firstNewMessageId(queryClient.getQueryData(["messages", conversationId]), readCount, myId));
+      })
+      .catch(() => {});
+
+    return () => {
+      ignore = true;
+    };
+  }, [conversationId, isPending, queryClient]);
+
+  // 화면에 그려지기 «전에» 스크롤 위치를 맞춘다 - 맨 위가 한 번 보였다가 내려가지 않게.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (el === null || isPending) return;
+
+    // 아래에 새 메시지가 붙었고 맨 아래를 보고 있었으면 같이 내린다. 위로 올려 옛 메시지를 읽던 중이면 그대로 둔다.
+    const newestId = data?.pages[0]?.items[0]?.id ?? null;
+    const added = newestIdRef.current !== null && newestId !== newestIdRef.current;
+    newestIdRef.current = newestId;
+    if (added && atBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
+      return;
+    }
+
+    // 앞 메시지를 위에 붙였으면, 늘어난 높이만큼 내려 보던 메시지가 제자리에 있게 한다.
+    const before = beforePrependRef.current;
+    if (before !== null) {
+      el.scrollTop = el.scrollHeight - before.scrollHeight + before.scrollTop;
+      beforePrependRef.current = null;
+      return;
+    }
+
+    if (hasScrolledToBottomRef.current) return;
+
+    // scrollHeight 는 내용 전체의 높이다. scrollTop 을 그만큼 주면 갈 수 있는 맨 아래까지 내려간다.
+    el.scrollTop = el.scrollHeight;
+    hasScrolledToBottomRef.current = true;
+  }, [isPending, conversation, data]);
+
+  // 다른 방에 다녀오면 이 창은 지워지지 않고 숨었다가 다시 보인다. 숨어 있는 동안 스크롤 위치가 0 으로 돌아가니,
+  // 숨을 때 «내렸다» 를 지워 두면 다시 보일 때 위의 effect 가 다시 맨 아래로 내린다.
+  useLayoutEffect(() => {
+    return () => {
+      hasScrolledToBottomRef.current = false;
+    };
+  }, []);
+
+  // 맨 위 감지용 요소가 스크롤 상자 안에서 보이면 그 앞 메시지 20개를 받는다.
+  // 목록과 달리 root 를 스크롤 상자로 준다 - 창 전체가 아니라 이 상자 안에서 보이는지를 본다.
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+
+    const target = topSentinelRef.current;
+    const root = scrollRef.current;
+    if (target === null || root === null) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          // 받기 직전의 높이와 위치를 기억해 둔다.
+          beforePrependRef.current = { scrollHeight: root.scrollHeight, scrollTop: root.scrollTop };
+          fetchNextPage();
+        }
+      },
+      { root },
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, conversation]);
+
+  // 메시지 보내기 - 실시간 연결로 dm:send 를 보내고, 결과(ack)가 오면 그 메시지를 창의 맨 아래에 붙인다.
+  const handleSend = (text) => {
+    getSocket().emit("dm:send", { conversationId, content: text }, (result) => {
+      if (result.error) {
+        showToast(result.error.message, "error");
+        return;
+      }
+
+      // 이력 캐시의 첫 페이지 맨 앞에 넣는다 - dm:message 로 먼저 와 있으면 다시 넣지 않는다.
+      addMessage(queryClient, result.data);
+
+      // 내가 보냈으니 맨 아래로 내린다 - «내렸다» 를 지우면 위의 effect 가 다시 내린다.
+      hasScrolledToBottomRef.current = false;
+
+      // 목록은 따로 고치지 않는다 - 내가 보낸 메시지도 dm:message 로 내 탭에 와서 그 방을 맨 위로 올린다.
+    });
+  };
+
+  if (!conversation) return null;
+
+  // 서버는 최신 메시지부터 준다(페이지 안에서도, 페이지끼리도). 화면은 아래가 최신이라 뒤집어서 그린다.
+  // reverse() 는 배열 자체를 바꾸지만, flatMap 이 새로 만든 배열이라 캐시의 페이지는 그대로다.
+  const messages = (data?.pages.flatMap((page) => page.items) ?? []).reverse();
+
+  const { otherUser } = conversation;
+  // 가장 최근 메시지가 내 것이고 상대가 읽었으면 그 아래에 «읽음» 을 둔다.
+  const lastMessage = messages.at(-1);
+  const seen = lastMessage !== undefined && lastMessage.senderId === me?.id && lastMessage.isRead;
+
+  return (
+    <section className={styles.pane}>
+      <header className={styles.header}>
+        <div className={styles.headerUser}>
+          {/* 좁은 화면에서만 보이는 버튼 - 목록으로 돌아간다. */}
+          <button
+            type="button"
+            className={styles.backButton}
+            onClick={() => router.push("/direct/inbox")}
+            aria-label="대화방 목록으로"
+          >
+            <FaChevronLeft size={20} />
+          </button>
+          <Image
+            src={otherUser.profileImage ?? DEFAULT_PROFILE_IMAGE}
+            alt={otherUser.username}
+            width={44}
+            height={44}
+            className={styles.headerAvatar}
+            loading="eager"
+          />
+          <div className={styles.headerText}>
+            <div className={styles.headerName}>{otherUser.name ?? otherUser.username}</div>
+            <div className={styles.headerUsername}>{otherUser.username}</div>
+          </div>
+        </div>
+        <div className={styles.headerActions}>
+          <button type="button" className={styles.headerIcon} aria-label="음성 통화">
+            <FaPhone size={22} />
+          </button>
+          <button type="button" className={styles.headerIcon} aria-label="영상 통화">
+            <FaVideo size={22} />
+          </button>
+          <button type="button" className={styles.headerIcon} aria-label="정보">
+            <FaCircleInfo size={22} />
+          </button>
+        </div>
+      </header>
+
+      <div
+        className={styles.scroll}
+        ref={scrollRef}
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          // 맨 아래까지 남은 거리가 거의 없으면 맨 아래를 보고 있는 것이다.
+          atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+        }}
+      >
+        {hasNextPage && <div ref={topSentinelRef} className={styles.topSentinel} />}
+
+        {isFetchingNextPage && (
+          <div className={styles.loadingOlder}>
+            <div className={styles.spinner} />
+          </div>
+        )}
+
+        {isPending ? (
+          <div className={styles.loadingInitial}>
+            <div className={styles.spinner} />
+          </div>
+        ) : messages.length === 0 ? (
+          <div className={styles.empty}>아직 메시지가 없습니다. 대화를 시작해 보세요!</div>
+        ) : (
+          messages.map((m, idx) => {
+            const isMine = m.senderId === me?.id;
+            const prev = messages[idx - 1];
+            // 앞 메시지와 날짜가 다르면(또는 맨 위 메시지면) 날짜 줄을 먼저 넣는다.
+            const showDate = !prev || !isSameDay(prev.createdAt, m.createdAt);
+            const position = computePosition(messages, idx);
+            // 상대 사진은 묶음의 마지막 말풍선 옆에만 둔다.
+            const showAvatar = !isMine && position !== "first" && position !== "middle";
+
+            return (
+              <div key={m.id}>
+                {showDate && <DateDivider dateString={m.createdAt} />}
+                {m.id === newMessageId && <NewMessagesDivider />}
+                <MessageBubble
+                  message={m}
+                  isMine={isMine}
+                  showAvatar={showAvatar}
+                  avatarUrl={otherUser.profileImage}
+                  position={position}
+                />
+              </div>
+            );
+          })
+        )}
+
+        {/* 인스타그램의 Seen 과 같은 줄이다 - 날짜 줄과 같은 글자 크기와 색을 쓴다. */}
+        {seen && <div style={{ textAlign: "right", padding: "0 16px", fontSize: 12, color: "#737373" }}>읽음</div>}
+
+        {isOtherTyping && <TypingBubble avatarUrl={otherUser.profileImage} />}
+      </div>
+
+      <MessageInput onSend={handleSend} conversationId={conversationId} />
+    </section>
+  );
+};
+
+export default MessagePane;
