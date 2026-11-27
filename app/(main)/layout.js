@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar.jsx";
 import AuthGuard from "@/components/AuthGuard.jsx";
 import LinkResult from "@/components/LinkResult.jsx";
 
-export default function MainLayout({ children }) {
+export default function MainLayout({ children, modal }) {
   return (
     <>
       <AuthGuard />
@@ -14,6 +14,8 @@ export default function MainLayout({ children }) {
       </Suspense>
       <Sidebar />
       {children}
+      {/* @modal 폴더가 그리는 것 — 피드에서 게시물을 누르면 모달, 그 밖에는 아무것도 없다. */}
+      {modal}
     </>
   );
 }

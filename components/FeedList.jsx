@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import styles from "./FeedList.module.scss";
 import stateStyles from "./StatusMessage.module.scss";
@@ -24,6 +25,7 @@ function getPostPage(pageParam) {
 }
 
 const FeedList = () => {
+  const router = useRouter();
   const { data: me } = useMe();
   const { data, isPending, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -93,6 +95,8 @@ const FeedList = () => {
             commentCount={post.commentCount}
             isFirst={index === 0}
             viewerId={me.id}
+            // 말풍선 버튼과 «댓글 N개 보기» 는 게시물 하나의 주소로 간다.
+            onOpenDetail={() => router.push(`/p/${post.id}`)}
           />
         ))}
       </div>

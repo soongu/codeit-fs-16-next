@@ -1,23 +1,22 @@
 // ~/instagram-next/app/(main)/[username]/saved/page.js
-import { notFound } from "next/navigation";
-import styles from "@/components/StatusMessage.module.scss";
-import { profiles } from "@/data/profiles.js";
+import { Suspense } from "react";
+import styles from "@/components/ProfilePage.module.scss";
+import SavedPosts from "@/components/SavedPosts.jsx";
 
 export const instant = false;
 
-export default async function SavedPage({ params }) {
+async function SavedContent({ params }) {
   const { username } = await params;
-  const profile = profiles.find((item) => item.username === username);
 
-  if (profile === undefined) {
-    notFound();
-  }
+  return <SavedPosts username={username} />;
+}
 
+export default function SavedPage({ params }) {
   return (
-    <main className={styles.hashtagMain}>
-      <p className={styles.emptyHint}>
-        {profile.username} 님이 저장한 게시물이 아직 없어요.
-      </p>
+    <main className={styles.profileMain}>
+      <Suspense fallback={null}>
+        <SavedContent params={params} />
+      </Suspense>
     </main>
   );
 }

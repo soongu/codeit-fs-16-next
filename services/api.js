@@ -29,8 +29,12 @@ async function request(path, { method, params, body, retried = false } = {}) {
   const query = params === undefined ? "" : `?${new URLSearchParams(params)}`;
   const options = { method };
 
-  // 보낼 값이 있으면 JSON 글자로 바꾸고, 본문이 JSON 이라는 것을 헤더로 알린다.
-  if (body !== undefined) {
+  if (body instanceof FormData) {
+    // 파일은 FormData 그대로 보낸다 — Content-Type 헤더는 적지 않는다.
+    // 브라우저가 multipart/form-data 와, 파트와 파트 사이에 넣을 boundary 글자를 직접 적는다.
+    options.body = body;
+  } else if (body !== undefined) {
+    // 보낼 값이 있으면 JSON 글자로 바꾸고, 본문이 JSON 이라는 것을 헤더로 알린다.
     options.headers = { "Content-Type": "application/json" };
     options.body = JSON.stringify(body);
   }
@@ -68,12 +72,50 @@ export const authApi = {
   unlinkSocialAccount: (provider) => request(`/auth/social-accounts/${provider}`, { method: "DELETE" }),
 };
 
+export const profileApi = {
+  get: (username) => request(`/profiles/${encodeURIComponent(username)}`),
+  getPosts: (username, params) => request(`/profiles/${encodeURIComponent(username)}/posts`, { params }),
+  // 이 사람을 팔로우한다 · 팔로우를 그만둔다 - 누가 하는지는 서버가 로그인 정보로 정한다.
+  follow: (username) => request(`/profiles/${encodeURIComponent(username)}/followers/me`, { method: "PUT" }),
+  unfollow: (username) => request(`/profiles/${encodeURIComponent(username)}/followers/me`, { method: "DELETE" }),
+  // 팔로워 목록(list = "followers")이나 팔로잉 목록(list = "following")의 한 페이지.
+  getFollowList: (username, list, params) => request(`/profiles/${encodeURIComponent(username)}/${list}`, { params }),
+};
+
+export const hashtagApi = {
+  getPosts: (name, params) => request(`/hashtags/${encodeURIComponent(name)}/posts`, { params }),
+};
+
 export const postApi = {
   getPage: (params) => request("/posts", { params }),
+  get: (id) => request(`/posts/${id}`),
   likePost: (id) => request(`/posts/${id}/likes/me`, { method: "PUT" }),
   unlikePost: (id) => request(`/posts/${id}/likes/me`, { method: "DELETE" }),
+  create: (body) => request("/posts", { method: "POST", body }),
+  update: (id, body) => request(`/posts/${id}`, { method: "PATCH", body }),
+  remove: (id) => request(`/posts/${id}`, { method: "DELETE" }),
+};
+
+export const commentApi = {
+  getPage: (postId, params) => request(`/posts/${postId}/comments`, { params }),
+  getReplies: (postId, commentId, params) => request(`/posts/${postId}/comments/${commentId}/replies`, { params }),
+  // parentId 를 주면 그 원댓글에 다는 답글이다. 원댓글을 달 때는 parentId 가 undefined 라 JSON 에 실리지 않는다.
+  create: (postId, content, parentId) => request(`/posts/${postId}/comments`, { method: "POST", body: { content, parentId } }),
+  remove: (postId, commentId) => request(`/posts/${postId}/comments/${commentId}`, { method: "DELETE" }),
 };
 
 export const memberApi = {
   search: (keyword) => request("/members/search", { params: { keyword } }),
+  // 올려 둔 사진의 주소를 내 프로필 사진으로 적는다.
+  updateProfileImage: (imageUrl) => request("/members/me/profile-image", { method: "PUT", body: { imageUrl } }),
+};
+
+export const uploadApi = {
+  // 사진 파일들을 올리고, 서버가 저장한 사진의 주소 목록을 받는다.
+  // 필드 이름 images 는 서버와 정한 이름이라 화면 컴포넌트는 파일 배열만 넘기면 된다.
+  images: (files) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    return request("/uploads", { method: "POST", body: formData });
+  },
 };

@@ -17,7 +17,10 @@ const Carousel = ({ imageUrls, alt, isFirst, onImageDoubleClick }) => {
   };
 
   // 사진을 두 번 누르면 하트가 0.8초 동안 커졌다 사라진다.
+  // 두 번 눌렀을 때 할 일을 받지 않았으면(만들기 모달의 미리보기) 아무 일도 하지 않는다.
   const handleDoubleClick = () => {
+    if (!onImageDoubleClick) return;
+
     onImageDoubleClick();
     setShowHeart(true);
     setTimeout(() => setShowHeart(false), 800);

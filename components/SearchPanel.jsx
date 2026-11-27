@@ -9,6 +9,7 @@ import { FaTimes } from "react-icons/fa";
 import { useUiStore } from "@/stores/useUiStore.js";
 import { memberApi } from "@/services/api.js";
 import styles from "./SearchPanel.module.scss";
+import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 
 export default function SearchPanel() {
   const isOpen = useUiStore((state) => state.isSearchOpen);
@@ -52,7 +53,8 @@ export default function SearchPanel() {
         onClick={() => goToProfile(member.username)}
       >
         <div className={styles.resultAvatar}>
-          <Image src={member.profileImage} alt={member.username} width={44} height={44} />
+          {/* 프로필 사진이 없는 사람은 기본 이미지를 보여 준다. */}
+          <Image src={member.profileImage ?? DEFAULT_PROFILE_IMAGE} alt={member.username} width={44} height={44} />
         </div>
         <div className={styles.resultInfo}>
           <span className={styles.resultUsername}>{member.username}</span>

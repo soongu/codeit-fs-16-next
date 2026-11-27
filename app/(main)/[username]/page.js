@@ -1,67 +1,37 @@
 // ~/instagram-next/app/(main)/[username]/page.js
-import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import styles from "@/components/ProfilePage.module.scss";
-import ProfileImage from "@/components/ProfileImage.jsx";
-import { getProfile, profiles } from "@/data/profiles.js";
+import ProfileHeader from "@/components/ProfileHeader.jsx";
+import ProfilePosts from "@/components/ProfilePosts.jsx";
 
 export const instant = false;
 
-export function generateStaticParams() {
-  return profiles.map((profile) => ({ username: profile.username }));
-}
-
+// 탭 제목에는 주소의 사용자 이름만 싣는다 - 이름과 숫자는 화면이 서버에서 받는다.
 export async function generateMetadata({ params }) {
   const { username } = await params;
-  const profile = await getProfile(username);
 
-  if (profile === undefined) {
-    return {};
-  }
-
-  return {
-    title: `${profile.name}(@${profile.username})`,
-    description: `게시물 ${profile.postCount}개, 팔로워 ${profile.followerCount}명, 팔로우 ${profile.followingCount}명`,
-  };
+  return { title: `@${username}` };
 }
 
-export default async function ProfilePage({ params }) {
+async function ProfileContent({ params }) {
   const { username } = await params;
-  const profile = await getProfile(username);
 
-  if (profile === undefined) {
-    notFound();
-  }
+  // 헤더와 그리드는 서로를 기다리지 않고 함께 받는다.
+  return (
+    <>
+      <ProfileHeader username={username} />
+      <ProfilePosts username={username} />
+    </>
+  );
+}
 
+// 주소의 사용자 이름을 읽는 부분은 Suspense 안에 둔다 - 상세 페이지가 주소의 번호를 읽을 때와 같다.
+export default function ProfilePage({ params }) {
   return (
     <main className={styles.profileMain}>
-      <header className={styles.profileHeader}>
-        <ProfileImage
-          imageUrl={profile.profileImage}
-          username={profile.username}
-        />
-
-        <div className={styles.profileInfo}>
-          <div className={styles.profileActions}>
-            <h2 className={styles.username}>{profile.username}</h2>
-          </div>
-
-          <ul className={styles.profileStats}>
-            <li>
-              게시물 <span className={styles.statsNumber}>{profile.postCount}</span>
-            </li>
-            <li>
-              팔로워 <span className={styles.statsNumber}>{profile.followerCount}</span>
-            </li>
-            <li>
-              팔로우 <span className={styles.statsNumber}>{profile.followingCount}</span>
-            </li>
-          </ul>
-
-          <div className={styles.profileBio}>
-            <span className={styles.fullName}>{profile.name}</span>
-          </div>
-        </div>
-      </header>
+      <Suspense fallback={null}>
+        <ProfileContent params={params} />
+      </Suspense>
     </main>
   );
 }

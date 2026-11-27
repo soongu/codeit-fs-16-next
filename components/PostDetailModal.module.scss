@@ -1,0 +1,533 @@
+// ~/instagram-next/components/PostDetailModal.module.scss
+
+// 모달 전체 레이아웃
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalBackdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+// 네비게이션 버튼 (외부 화살표)
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+  color: #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+  svg {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: #fff;
+  }
+}
+
+.navLeft {
+  left: 20px;
+}
+
+.navRight {
+  right: 20px;
+}
+
+// 모달 본문 레이아웃
+.modalContent {
+  position: relative;
+  width: 85%;
+  max-width: 1700px;
+  height: 90%;
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  overflow: hidden;
+}
+
+// 닫기 버튼
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+// 네비게이션 버튼
+.modalNavigationButtons {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.modalPrevButton,
+.modalNextButton {
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  color: #000;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+// 이미지 캐러셀 컨테이너
+.modalCarouselContainer {
+  flex: 2;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  .carouselContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .carouselTrack {
+    display: flex;
+    height: 100%;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .carouselTrack img {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// 게시물 상세 사이드바
+.modalSidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #dbdbdb;
+}
+
+// 게시물 상단 프로필 정보
+.postHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #dbdbdb;
+
+  .postUserInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .postHeaderRight {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .postProfileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .postUsername {
+    font-weight: bold;
+    color: #262626;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .postOptionsButton {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}
+
+.followButton {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #0095f6;
+  color: white;
+}
+
+.following {
+  background-color: #efefef;
+  color: #262626;
+}
+
+@media (prefers-color-scheme: dark) {
+  .following {
+    background-color: #363636;
+    color: #fafafa;
+  }
+}
+// 댓글 목록
+.commentsContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  margin-top: 15px;
+
+  .commentItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .postProfileImage {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+
+  .commentContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 10px;
+  }
+
+  .postUsername {
+    font-weight: bold;
+    font-size: 14px;
+    color: #262626;
+    margin-right: 0.5rem;
+    cursor: pointer;
+  }
+
+  .postCaption {
+    font-size: 14px;
+    color: #262626;
+    word-wrap: break-word;
+  }
+
+  .postTime {
+    font-size: 12px;
+    color: #737373;
+  }
+
+  .commentTimeAndReply {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .commentLikes {
+    font-size: 12px;
+    color: #737373;
+    font-weight: 600;
+  }
+
+  .replyButton {
+    background: none;
+    border: none;
+    color: #737373;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+  }
+
+  .viewRepliesContainer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  .replyLine {
+    width: 24px;
+    height: 1px;
+    background-color: #737373;
+  }
+
+  .viewRepliesButton {
+    background: none;
+    border: none;
+    color: #737373;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .replyForm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .replyInput {
+    flex: 1;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .replySubmitButton {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: #0095f6;
+    color: #fff;
+
+    &:disabled {
+      background-color: #b3e0ff;
+      cursor: not-allowed;
+    }
+  }
+
+  .noCommentsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20%;
+  }
+
+  .noComments {
+    color: #000;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .noCommentsAdditional {
+    font-size: 14px;
+    margin-top: 8px;
+    color: #8e8e8e;
+  }
+  
+  .loadMoreContainer {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+    margin-top: 8px;
+  }
+  
+  .loadMoreButton {
+    background: none;
+    border: none;
+    color: #262626;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    
+    svg {
+      transition: opacity 0.2s;
+    }
+
+    &:hover svg {
+      opacity: 0.6;
+    }
+  }
+
+  // Skeleton UI
+  .skeletonItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .skeletonAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #efefef;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  .skeletonContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .skeletonText {
+    height: 12px;
+    background: #efefef;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  .skeletonTextShort {
+    width: 40%;
+  }
+
+  .skeletonTextLong {
+    width: 80%;
+  }
+
+  @keyframes shimmer {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  .replySpinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #dbdbdb;
+    border-top-color: #8e8e8e;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
+// 좋아요 및 액션 버튼
+.postActions {
+  padding: 16px;
+  border-top: 1px solid #dbdbdb;
+
+  .actionButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .actionButtonsLeft {
+      display: flex;
+      gap: 16px;
+    }
+
+    .actionButton {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      color: #262626;
+
+      &:hover {
+        color: #8e8e8e;
+      }
+    }
+  }
+
+  .likesCount {
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+}
+
+// 댓글 입력 폼
+.comment {
+  width: 100%;
+  border-top: 1px solid #dbdbdb;
+  padding: 8px 16px;
+}
+
+.liked {
+  color: #f00;
+}
+// 반응형 적용
+@media (max-width: 768px) {
+  .modalContent {
+    flex-direction: column;
+    width: 95%;
+    height: auto;
+  }
+
+  .modalCarouselContainer {
+    width: 100%;
+    height: 50%;
+  }
+
+  .modalSidebar {
+    width: 100%;
+    height: 50%;
+    border-left: none;
+  }
+
+  .commentsContainer {
+    max-height: 200px;
+  }
+}

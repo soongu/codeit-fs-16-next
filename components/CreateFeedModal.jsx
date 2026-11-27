@@ -1,91 +1,110 @@
 // ~/instagram-next/components/CreateFeedModal.jsx
-import { useRef, useState } from "react";
-import Image from "next/image";
-import { FaImages, FaXmark } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FaXmark } from "react-icons/fa6";
 import styles from "./CreateFeedModal.module.scss";
-import carousel from "./Carousel.module.scss";
+import CreateFeedDiscard from "./CreateFeedDiscard.jsx";
+import CreateFeedHeader from "./CreateFeedHeader.jsx";
+import CreateFeedUpload from "./CreateFeedUpload.jsx";
+import CreateFeedWrite from "./CreateFeedWrite.jsx";
+import { postApi, uploadApi, ApiError } from "@/services/api.js";
+import { useUiStore } from "@/stores/useUiStore.js";
 
 const CreateFeedModal = ({ onClose }) => {
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const fileInputRef = useRef(null);
+  const [step, setStep] = useState(1);
+  const [files, setFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const [content, setContent] = useState("");
+  const [isDiscardOpen, setIsDiscardOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const showToast = useUiStore((state) => state.showToast);
 
-  const handlePick = () => {
-    fileInputRef.current.click();
+  // 사진을 고르면 파일마다 미리보기 주소를 만들고 단계 2 로 간다.
+  const handleFilesSelected = (selected) => {
+    setFiles(selected);
+    setPreviewUrls(selected.map((file) => URL.createObjectURL(file)));
+    setStep(2);
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+  // 미리보기 주소 목록이 바뀌면(다시 고르면) 앞 목록을, 모달이 닫히면 마지막 목록을 해제한다.
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
+  const { mutate, isPending } = useMutation({
+    // 사진을 먼저 올려 주소를 받고, 그 주소와 글로 게시물을 만든다.
+    mutationFn: async () => {
+      const { imageUrls } = await uploadApi.images(files);
+      // 사진의 대체 텍스트(alt)를 받는 입력칸이 따로 없어서 글을 그대로 보낸다.
+      await postApi.create({ content, postAlt: content, imageUrls });
+    },
+    // 피드를 다시 받은 뒤에 모달을 닫는다 — 모달이 닫히면 새 게시물이 피드 맨 위에 있다.
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["posts"] });
+      onClose();
+    },
+    // 실패하면 화면 위쪽 알림으로 알린다 — 모달은 그대로 두어 다시 누를 수 있다.
+    // 응답을 받았으면 request() 가 만든 문장(서버가 보낸 문장, 없으면 상태 코드 문장)을, 응답조차 못 받았으면 화면이 정한 문장을 보여 준다.
+    onError: (error) => {
+      showToast(error instanceof ApiError ? error.message : "게시물을 올리지 못했어요. 다시 시도해 주세요.", "error");
+    },
+  });
+
+  const handleShare = () => {
+    mutate();
+  };
+
+  // 올리는 동안에는 ✕ 나 바깥을 눌러도 닫지 않는다.
+  // 글쓰기 단계에서는 바로 닫지 않고, 고른 사진과 쓴 글을 버릴지 먼저 묻는다.
+  const handleClose = () => {
+    if (isPending) return;
+
+    if (step === 2) {
+      setIsDiscardOpen(true);
+    } else {
+      onClose();
     }
-
-    fileInputRef.current.value = "";
   };
 
   return (
     <div className={styles.modalContainer}>
-      <div className={styles.modalBackdrop} onClick={onClose} />
+      <div className={styles.modalBackdrop} onClick={handleClose} />
 
-      <button className={styles.modalCloseButton} onClick={onClose} type="button">
+      <button className={styles.modalCloseButton} onClick={handleClose} type="button">
         <FaXmark />
       </button>
 
       <div className={styles.modalContent}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>새 게시물 만들기</h2>
-        </div>
+        <CreateFeedHeader
+          step={step}
+          isSharing={isPending}
+          onBack={() => setStep(1)}
+          onShare={handleShare}
+        />
 
         <div className={styles.modalBody}>
-          <div className={`${styles.step} ${styles.active}`}>
-            <div className={styles.uploadContainer}>
-              <input
-                type="file"
-                ref={fileInputRef}
-                accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-              />
+          <div className={`${styles.step} ${step === 1 ? styles.active : ""}`}>
+            <CreateFeedUpload onFilesSelected={handleFilesSelected} />
+          </div>
 
-              {previewUrl ? (
-                <>
-                  <div className={styles.previewContainer}>
-                    <div className={styles.previewArea}>
-                      <div className={carousel.carouselSlide}>
-                        <Image
-                          src={previewUrl}
-                          alt="고른 사진 미리보기"
-                          width={600}
-                          height={600}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    className={styles.uploadButton}
-                    onClick={handlePick}
-                    type="button"
-                  >
-                    다른 사진 고르기
-                  </button>
-                </>
-              ) : (
-                <div className={styles.uploadArea}>
-                  <FaImages size={48} color="#262626" />
-                  <p>사진과 동영상을 여기에 끌어다 놓으세요</p>
-                  <button
-                    className={styles.uploadButton}
-                    onClick={handlePick}
-                    type="button"
-                  >
-                    컴퓨터에서 선택
-                  </button>
-                </div>
-              )}
-            </div>
+          <div className={`${styles.step} ${step === 2 ? styles.active : ""}`}>
+            {step === 2 && (
+              <CreateFeedWrite
+                previewUrls={previewUrls}
+                content={content}
+                onContentChange={setContent}
+              />
+            )}
           </div>
         </div>
       </div>
+
+      {/* «삭제» 는 모달을 닫는다 — 모달이 화면에서 빠지면 고른 사진과 쓴 글도 함께 사라진다. «취소» 는 묻는 것만 닫는다. */}
+      {isDiscardOpen && (
+        <CreateFeedDiscard onConfirm={onClose} onCancel={() => setIsDiscardOpen(false)} />
+      )}
     </div>
   );
 };

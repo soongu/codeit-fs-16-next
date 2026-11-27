@@ -22,6 +22,8 @@ const FeedItem = ({
   commentCount,
   isFirst,
   viewerId,
+  onOpenDetail,
+  onOpenOptions,
 }) => {
   const { mutate, isPending } = useLikePost(viewerId);
   const toggleLike = () => mutate({ postId, liked: !liked });
@@ -38,6 +40,7 @@ const FeedItem = ({
         postId={postId}
         username={username}
         profileImage={profileImage}
+        onOpenOptions={onOpenOptions}
       />
 
       <div className={styles.imageContainer}>
@@ -54,6 +57,7 @@ const FeedItem = ({
         liked={liked}
         isPending={isPending}
         onToggleLike={toggleLike}
+        onOpenDetail={onOpenDetail}
       />
 
       <div className={styles.content}>
@@ -65,8 +69,8 @@ const FeedItem = ({
       </div>
 
       <CommentArea>
-        <FeedItemComments commentCount={commentCount} />
-        <CommentForm postId={postId} />
+        <FeedItemComments commentCount={commentCount} onOpenDetail={onOpenDetail} />
+        <CommentForm postId={postId} viewerId={viewerId} />
       </CommentArea>
     </article>
   );
