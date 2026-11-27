@@ -121,6 +121,10 @@ export const notificationApi = {
   getPage: (params) => request("/notifications", { params }),
   // 알림 하나를 읽음으로 - { id, isRead: true }
   markAsRead: (id) => request(`/notifications/${id}/read`, { method: "PATCH" }),
+  // 아직 안 본 알림 수 - { unseenCount }
+  getUnseen: () => request("/notifications/unseen"),
+  // 알림 패널을 열었다 - 지금까지 온 알림을 모두 본 것으로 친다.
+  markSeen: () => request("/notifications/seen", { method: "PATCH" }),
 };
 
 export const memberApi = {
