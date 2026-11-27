@@ -119,6 +119,8 @@ export const conversationApi = {
 export const notificationApi = {
   // 내 알림 목록의 한 페이지 - 가장 최근 알림이 먼저다.
   getPage: (params) => request("/notifications", { params }),
+  // 알림 하나를 읽음으로 - { id, isRead: true }
+  markAsRead: (id) => request(`/notifications/${id}/read`, { method: "PATCH" }),
 };
 
 export const memberApi = {

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { FaHeart, FaRegComment, FaUserPlus, FaAt } from "react-icons/fa6";
 import { useUiStore } from "@/stores/useUiStore.js";
 import { useNotifications } from "@/hooks/useNotifications.js";
+import { useReadNotification } from "@/hooks/useReadNotification.js";
 import { timeAgo } from "@/utils/timeAgo.js";
 import { DEFAULT_PROFILE_IMAGE } from "@/utils/profileImage.js";
 import styles from "./NotificationPanel.module.scss";
@@ -34,6 +35,7 @@ export default function NotificationPanel() {
   const isOpen = useUiStore((state) => state.isNotificationOpen);
   const close = useUiStore((state) => state.closeNotification);
   const router = useRouter();
+  const { mutate: markAsRead } = useReadNotification();
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotifications(isOpen);
   const sentinelRef = useRef(null);
 
@@ -62,7 +64,11 @@ export default function NotificationPanel() {
   const notifications = data?.pages.flatMap((page) => page.items) ?? [];
 
   // 알림을 누르면 패널을 닫고 그 알림이 가리키는 곳으로 간다 - 팔로우는 그 사람의 프로필, 나머지는 그 게시물.
+  // 아직 안 읽은 알림이면 서버에 읽음으로 알린다 - 이미 읽은 알림은 요청을 보내지 않는다.
   const handleNotificationClick = (notification) => {
+    if (!notification.isRead) {
+      markAsRead(notification.id);
+    }
     close();
     router.push(notification.type === "FOLLOW" ? `/${notification.sender.username}` : `/p/${notification.postId}`);
   };
