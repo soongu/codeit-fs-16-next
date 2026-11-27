@@ -1,6 +1,6 @@
 # codeit-fs-16-next
 
-인스타그램 클론의 화면(프론트엔드)이에요. Next.js 16(App Router) + React 19 + React Query + Zustand로 만들어져 있고, 로그인·피드·게시물·댓글·해시태그·프로필·팔로우를 백엔드 서버와 주고받아요.
+인스타그램 클론의 화면(프론트엔드)이에요. Next.js 16(App Router) + React 19 + React Query + Zustand로 만들어져 있고, 로그인·피드·게시물·댓글·해시태그·프로필·팔로우·DM(메시지)·알림을 백엔드 서버와 주고받아요. DM과 알림은 Socket.IO로 실시간으로 받아요.
 
 데이터는 짝이 되는 백엔드 [instagram-api-express2026](https://github.com/soongu/instagram-api-express2026)에서 가져와요. **백엔드를 먼저 켜 두지 않으면 로그인도 피드도 동작하지 않아요.** 아래 1단계에서 그 저장소를 내려받아 서버를 켜세요.
 
@@ -48,7 +48,7 @@ cd codeit-fs-16-next
 npm install
 ```
 
-`main` 브랜치에는 **마지막으로 정리된 코드(p3-61 시점)** 가 들어 있어요. 수업 회차별 코드를 보고 싶으면 아래 「회차별 브랜치 보기」를 읽으세요.
+`main` 브랜치에는 **마지막으로 정리된 코드(p3-69 시점)** 가 들어 있어요. 수업 회차별 코드를 보고 싶으면 아래 「회차별 브랜치 보기」를 읽으세요.
 
 ## 3. `.env.local` 파일 만들기
 
@@ -103,6 +103,7 @@ npm run dev -- -p 3001
 1. 로그인하지 않았으니 `/login` 화면으로 자동으로 넘어가요.
 2. 백엔드의 예시 계정으로 로그인해요. 사용자 이름 `jaehoon`, 비밀번호 `jaehoon1234`예요. (규칙은 **사용자 이름 + `1234`** — `minji`는 `minji1234`예요.)
 3. 로그인되면 피드에 게시물이 보여요.
+4. DM을 보려면 주소창에 `http://localhost:3001/minji`를 열고 «메시지 보내기»를 눌러요. `minji`와의 대화방 화면(`/direct/t/대화방번호`)으로 넘어가요. 왼쪽 메뉴의 «메시지»를 누르면 대화방 목록(`/direct/inbox`)이 보여요.
 
 로그인이 안 되거나 피드가 비어 있으면 아래 「자주 만나는 문제」를 보세요.
 
@@ -165,6 +166,7 @@ npm install                # 패키지가 달라졌을 수 있으니 다시 설�
 | 화면 | React 19, Sass |
 | 서버 데이터 | TanStack React Query 5 |
 | 화면 상태 | Zustand |
+| 실시간 | socket.io-client 4 (DM·알림) |
 | 검증 | zod |
 
 ## 폴더
@@ -173,12 +175,12 @@ npm install                # 패키지가 달라졌을 수 있으니 다시 설�
  app/             화면과 주소 (App Router) — 로그인·피드·프로필 등
  components/      여러 화면이 같이 쓰는 컴포넌트
  hooks/           React Query 를 감싼 훅 (게시물·로그인 등)
- services/        백엔드 API 호출 함수
+ services/        백엔드 API 호출 함수와 실시간 연결(socket.js)
  stores/          Zustand 상태
  utils/           작은 도우미 함수
  styles/          전역·공통 스타일
  data/            화면에서 쓰는 고정 데이터
  requests/        .http 요청 예시
  proxy.js         로그인 쿠키가 없으면 /login 으로 보내는 처리
- next.config.mjs  백엔드로 넘겨 주는 주소(rewrites)와 이미지 설정
+ next.config.mjs  백엔드로 넘겨 주는 주소(rewrites, 실시간 연결 /socket.io 포함)와 이미지 설정
 ```
