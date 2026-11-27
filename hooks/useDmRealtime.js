@@ -6,6 +6,21 @@ import { getSocket } from "@/services/socket.js";
 import { conversationApi } from "@/services/api.js";
 import { addMessage } from "@/hooks/useMessages.js";
 import { moveToTop, readConversation, clearUnread } from "@/hooks/useConversations.js";
+import { useUiStore } from "@/stores/useUiStore.js";
+
+// 누가 보냈는지 화면 위쪽에 잠깐 알린다 - 메시지에는 보낸 사람의 번호만 있어서 대화방의 상대 이름을 쓴다.
+// 그 방을 받아 둔 적이 있으면 그것을, 없으면 서버에 한 번 묻는다(메시지 창이 쓰는 그 캐시다).
+async function showMessageToast(queryClient, conversationId) {
+  try {
+    const conversation = await queryClient.ensureQueryData({
+      queryKey: ["conversation", conversationId],
+      queryFn: () => conversationApi.get(conversationId),
+    });
+    useUiStore.getState().showToast(`${conversation.otherUser.username}님이 메시지를 보냈어요`);
+  } catch {
+    // 이름을 못 받았으면 띄우지 않는다 - 사이드바 «메시지» 의 점은 그대로 뜬다.
+  }
+}
 
 // 실시간으로 오는 DM 을 듣는다 - 로그인한 화면 전체에서 한 번만 부른다.
 export function useDmRealtime() {
@@ -38,6 +53,11 @@ export function useDmRealtime() {
       } else if (fromOther) {
         // 사이드바 점 - 안 읽은 방이 새로 생겼는지는 서버에 다시 묻는다(목록을 안 받은 화면에서도 맞게).
         queryClient.invalidateQueries({ queryKey: ["unreadConversations"] });
+      }
+
+      // DM 화면(/direct 로 시작하는 주소) 밖에 있으면 화면 위쪽에 알린다 - DM 화면에서는 목록과 창이 이미 보여 준다.
+      if (fromOther && !pathname.startsWith("/direct")) {
+        showMessageToast(queryClient, message.conversationId);
       }
     };
 
