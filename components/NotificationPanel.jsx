@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { FaHeart, FaRegComment, FaUserPlus, FaAt } from "react-icons/fa6";
 import { useUiStore } from "@/stores/useUiStore.js";
 import { useNotifications } from "@/hooks/useNotifications.js";
@@ -31,6 +32,8 @@ const TypeBadge = ({ type }) => {
 
 export default function NotificationPanel() {
   const isOpen = useUiStore((state) => state.isNotificationOpen);
+  const close = useUiStore((state) => state.closeNotification);
+  const router = useRouter();
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotifications(isOpen);
   const sentinelRef = useRef(null);
 
@@ -58,6 +61,12 @@ export default function NotificationPanel() {
 
   const notifications = data?.pages.flatMap((page) => page.items) ?? [];
 
+  // 알림을 누르면 패널을 닫고 그 알림이 가리키는 곳으로 간다 - 팔로우는 그 사람의 프로필, 나머지는 그 게시물.
+  const handleNotificationClick = (notification) => {
+    close();
+    router.push(notification.type === "FOLLOW" ? `/${notification.sender.username}` : `/p/${notification.postId}`);
+  };
+
   return (
     <div className={`${styles.notificationPanel} ${isOpen ? styles.open : ""}`}>
       <div className={styles.header}>
@@ -80,7 +89,11 @@ export default function NotificationPanel() {
         ) : notifications.length > 0 ? (
           <>
             {notifications.map((n) => (
-              <div key={n.id} className={`${styles.notificationItem} ${!n.isRead ? styles.unread : ""}`}>
+              <div
+                key={n.id}
+                className={`${styles.notificationItem} ${!n.isRead ? styles.unread : ""}`}
+                onClick={() => handleNotificationClick(n)}
+              >
                 <div className={styles.notificationAvatar}>
                   {/* 프로필 사진이 없는 사람은 기본 이미지를 보여 준다. */}
                   <Image src={n.sender.profileImage ?? DEFAULT_PROFILE_IMAGE} alt={n.sender.username} width={44} height={44} />
