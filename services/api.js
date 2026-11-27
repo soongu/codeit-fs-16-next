@@ -13,7 +13,8 @@ export class ApiError extends Error {
 // 같은 Refresh 토큰이 두 번 가면 서버는 이미 쓴 토큰이 다시 왔다고 보고 로그인 기록을 지운다.
 let reissuing = null;
 
-function reissue() {
+// 소켓 연결도 같은 재발급을 쓴다(services/socket.js) - 그래서 내보낸다.
+export function reissue() {
   if (reissuing === null) {
     reissuing = request("/auth/reissue", { method: "POST" }).finally(() => {
       reissuing = null;
