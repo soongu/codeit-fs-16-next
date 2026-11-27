@@ -5,26 +5,27 @@ import { useUiStore } from "@/stores/useUiStore.js";
 import styles from "./Sidebar.module.scss";
 
 export default function SidebarNav({ children }) {
-  const isSearchOpen = useUiStore((state) => state.isSearchOpen);
-  const closeSearch = useUiStore((state) => state.closeSearch);
+  // 검색 패널이나 알림 패널이 열려 있으면 사이드바를 좁힌다.
+  const isPanelOpen = useUiStore((state) => state.isSearchOpen || state.isNotificationOpen);
+  const closePanels = useUiStore((state) => state.closePanels);
 
-  // 사이드바 안의 링크를 누르면 검색 패널을 닫는다.
+  // 사이드바 안의 링크를 누르면 열려 있는 패널을 닫는다.
   const closeOnLink = (event) => {
     if (event.target.closest("a")) {
-      closeSearch();
+      closePanels();
     }
   };
 
   return (
     <>
       <nav
-        className={`${styles.sidebar} ${isSearchOpen ? styles.collapsed : ""}`}
+        className={`${styles.sidebar} ${isPanelOpen ? styles.collapsed : ""}`}
         onClick={closeOnLink}
       >
         {children}
       </nav>
 
-      {isSearchOpen && <div className={styles.searchBackdrop} onClick={closeSearch} />}
+      {isPanelOpen && <div className={styles.searchBackdrop} onClick={closePanels} />}
     </>
   );
 }

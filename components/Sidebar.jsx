@@ -6,6 +6,8 @@ import NavLink from "./NavLink.jsx";
 import CreateButton from "./CreateButton.jsx";
 import SearchButton from "./SearchButton.jsx";
 import SearchPanel from "./SearchPanel.jsx";
+import NotificationButton from "./NotificationButton.jsx";
+import NotificationPanel from "./NotificationPanel.jsx";
 import SidebarNav from "./SidebarNav.jsx";
 import ProfileLink from "./ProfileLink.jsx";
 import MoreButton from "./MoreButton.jsx";
@@ -38,6 +40,8 @@ function Sidebar() {
             <span className={styles.menuText}>메시지</span>
           </NavLink>
 
+          <NotificationButton />
+
           <CreateButton />
 
           <ProfileLink />
@@ -49,6 +53,7 @@ function Sidebar() {
       </SidebarNav>
 
       <SearchPanel />
+      <NotificationPanel />
     </>
   );
 }
