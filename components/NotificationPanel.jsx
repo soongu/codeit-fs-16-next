@@ -31,7 +31,7 @@ const TypeBadge = ({ type }) => {
 
 export default function NotificationPanel() {
   const isOpen = useUiStore((state) => state.isNotificationOpen);
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotifications();
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotifications(isOpen);
   const sentinelRef = useRef(null);
 
   // 목록 맨 아래 감지용 요소가 보이면 다음 20개를 받는다 - 팔로워 목록과 같은 방법이다.
